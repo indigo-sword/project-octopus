@@ -5,3 +5,4 @@ class NodeLink:
         # n1 and n2 order matters. n1 is the node that comes before n2.
 
         self.descr = descr    # string
+        
