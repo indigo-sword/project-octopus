@@ -15,7 +15,7 @@ class PathDescription:
     def get(self):
         return self.descr
 
-
+# paths WILL need to be stored in a DB.
 class Path:
     def __init__(self):
         self.id = PathId()
