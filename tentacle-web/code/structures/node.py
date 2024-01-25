@@ -1,30 +1,64 @@
-from nodelink import NodeLink
+from level import Level
+from user import User
+
+# All of this code is not database-ready yet. 
+# we need to create code to initiate empty guys.
+# we need to create code to load, save, update and delete them to the database.
+
+# OR: we could use an ORM like SQLAlchemy to do this for us, so the objects will be
+# stored and we don't have to worry about it.
+
+class NodeId:
+    def __init__(self):
+        self.id = 0            # create an ID
+
+    def get(self):
+        return self.id
+
+class Description:
+    def __init__(self, descr=""):
+        self.descr = descr    # string
+
+    def set(self, descr):
+        self.descr = descr
+
+    def get(self):
+        return self.descr
+
+class NodeLink:
+    def __init__(self, n=NodeId(), descr=Description()):
+        self.node = n                 
+        self.descr = descr 
+    
+    def get_node(self):
+        return self.node
 
 class Node:
-    def __init__(self):
-        self.previous = set()       # set of NodeLink structures
-        self.next = set()           # set of NodeLink structures
-        self.level = None           # gotta see how this works
-        self.description = ""       # string -- not sure if necessary
-        self.owner = None           # user object
-        self.playcount = 0          # int
-        self.ID = None              # ?
+    def __init__(self, level: Level, description: Description, user: User):
+        self.level = level                   # gotta see how this works
+        self.description = description       
+        self.user = user                     # gotta see how this works
+        self.id = NodeId()
 
-    # link to next node by doing node1.link_next(node2, "some action that gets taken")
-    def link_next(self, node, descr):
-        # create a Nodelink object
-        l = NodeLink(self, node, descr)
+        # attributes that will change over time. we will need to model their functions
+        # so that they can deal with concurrent access.
 
-        # add the link to both nodes
-        self.next.add(l)
-        node.previous.add(l)
+        # or maybe we can leave it to the database / API to deal with concurrent access
+        # because we will save them in a DB, right?
+        
+        self.previous = set()                
+        self.next = set()                 
+        self.playcount = 0                  
 
-    # link to previous node by doing node1.link_prev(node2, "some action that gets taken")
-    def link_prev(self, node, descr):
-        # create a Nodelink object
-        l = NodeLink(node, self, descr)
+    def link_next(self, node: 'Node', description: Description):
+        ''' link to next node '''
+        self.next.add(NodeLink(node.id, description))
+        node.previous.add(NodeLink(self.id, description))
 
-        # add the link to both nodes
-        self.previous.add(l)
-        node.next.add(l)
+    def link_previous(self, node: 'Node', description: Description):
+        ''' link to next node '''
+        self.previous.add(NodeLink(node.id, description))
+        node.next.add(NodeLink(self.id, description))
 
+    def update_playcount(self):
+        self.playcount += 1
