@@ -12,3 +12,8 @@ We should save the path names, alongside their owner / creator, description, in 
 
 To create new path IDs, we should go through a centralized queue that will receive them. We don't want just to create
 the IDs instantly to avoid paths with same name.
+
+We do need:
+
+- a level database. Somehow store the level somewhere, store its node id there.
+- a node database. Store node id, and its info. Should not be hard.
