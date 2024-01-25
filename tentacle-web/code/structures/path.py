@@ -6,7 +6,7 @@ class PathId:
         return self.id
     
 class PathDescription:
-    def __init__(self, descr=""):
+    def __init__(self, descr: str=""):
         self.descr = descr    # string
 
     def set(self, descr):

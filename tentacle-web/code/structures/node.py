@@ -16,7 +16,7 @@ class NodeId:
         return self.id
 
 class NodeDescription:
-    def __init__(self, descr=""):
+    def __init__(self, descr: str=""):
         self.descr = descr    # string
 
     def set(self, descr):
