@@ -15,7 +15,7 @@ class NodeId:
     def get(self):
         return self.id
 
-class Description:
+class NodeDescription:
     def __init__(self, descr=""):
         self.descr = descr    # string
 
@@ -26,7 +26,7 @@ class Description:
         return self.descr
 
 class NodeLink:
-    def __init__(self, n=NodeId(), descr=Description()):
+    def __init__(self, n=NodeId(), descr=NodeDescription()):
         self.node = n                 
         self.descr = descr 
     
@@ -34,7 +34,7 @@ class NodeLink:
         return self.node
 
 class Node:
-    def __init__(self, level: Level, description: Description, user: User):
+    def __init__(self, level: Level, description: NodeDescription, user: User):
         self.level = level                   # gotta see how this works
         self.description = description       
         self.user = user                     # gotta see how this works
@@ -50,12 +50,12 @@ class Node:
         self.next = set()                 
         self.playcount = 0                  
 
-    def link_next(self, node: 'Node', description: Description):
+    def link_next(self, node: 'Node', description: NodeDescription):
         ''' link to next node '''
         self.next.add(NodeLink(node.id, description))
         node.previous.add(NodeLink(self.id, description))
 
-    def link_previous(self, node: 'Node', description: Description):
+    def link_previous(self, node: 'Node', description: NodeDescription):
         ''' link to next node '''
         self.previous.add(NodeLink(node.id, description))
         node.next.add(NodeLink(self.id, description))
