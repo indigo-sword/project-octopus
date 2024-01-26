@@ -8,7 +8,7 @@ and path N1 N6 N8 N9 will be path #3.
 The link between each node should have a description put by the creator
 
 We should save the path names, alongside their owner / creator, description, in some kind of database.
--- Where are we going to save the paths and levels??
+-- Where are we going to save the levels??
 
 To create new path IDs, we should go through a centralized queue that will receive them. We don't want just to create
 the IDs instantly to avoid paths with same name.

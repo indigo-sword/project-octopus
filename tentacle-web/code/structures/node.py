@@ -35,9 +35,9 @@ class NodeLink:
 
 class Node:
     def __init__(self, level: Level, description: NodeDescription, user: User):
-        self.level = level                   # gotta see how this works
-        self.description = description       
-        self.user = user                     # gotta see how this works
+        self.level = level                   
+        self.description = description   
+        self.user = user                     
         self.id = NodeId()
 
         # attributes that will change over time. we will need to model their functions
@@ -48,15 +48,22 @@ class Node:
         
         self.previous = set()                
         self.next = set()                 
-        self.playcount = 0                  
+        self.playcount = 0
+        self.rating = 0
 
     def link_next(self, node: 'Node', description: NodeDescription):
         ''' link to next node '''
+        if node == self:
+            raise Exception("Cannot link node to itself")
+        
         self.next.add(NodeLink(node.id, description))
         node.previous.add(NodeLink(self.id, description))
 
     def link_previous(self, node: 'Node', description: NodeDescription):
         ''' link to next node '''
+        if node == self:
+            raise Exception("Cannot link node to itself")
+        
         self.previous.add(NodeLink(node.id, description))
         node.next.add(NodeLink(self.id, description))
 
