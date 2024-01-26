@@ -1,3 +1,4 @@
+from node import Node
 class PathId:
     def __init__(self):
         self.id = 0            # create an ID
@@ -21,3 +22,6 @@ class Path:
         self.id = PathId()
         self.node_sequence = []
         self.description = PathDescription()
+
+    def add_node(self, node: Node):
+        self.node_sequence.append(node)
