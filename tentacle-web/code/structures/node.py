@@ -32,6 +32,9 @@ class NodeLink:
     
     def get_node(self):
         return self.node
+    
+    def get_description(self):
+        return self.descr.get()
 
 class Node:
     def __init__(self, level: Level, description: NodeDescription, user: User):
