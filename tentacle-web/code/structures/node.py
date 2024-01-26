@@ -8,7 +8,7 @@ from user import User
 # OR: we could use an ORM like SQLAlchemy to do this for us, so the objects will be
 # stored and we don't have to worry about it.
 
-from ..database.db_manager import Base
+from code.database.db_manager import *
 
 class NodeId:
     def __init__(self):
