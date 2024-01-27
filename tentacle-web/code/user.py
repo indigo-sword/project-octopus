@@ -1,7 +1,9 @@
-class User:
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
-        # should be expanded
+from sqlalchemy import Column, Integer, String
+from db_manager import Base
 
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String)
+    password = Column(String)
+    email = Column(String)

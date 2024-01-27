@@ -5,8 +5,6 @@ engine = create_engine('sqlite:///tentacle-web.sqlite', echo=True)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
-# test
-Jonas = 1
 
 # this method will only run once, when the database is created
 def init_db():

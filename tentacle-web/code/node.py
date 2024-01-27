@@ -7,70 +7,68 @@ from user import User
 
 # OR: we could use an ORM like SQLAlchemy to do this for us, so the objects will be
 # stored and we don't have to worry about it.
+        ## ^^ i chose this option btw
 
-from code.database.db_manager import *
+from db_manager import Base, engine
+from sqlalchemy import Column, Integer, String, ForeignKe, update
+from sqlalchemy.orm import relationship, Session
 
-class NodeId:
-    def __init__(self):
-        self.id = 0            # create an ID
+class NodeLink(Base):
+    __tablename__ = 'node_links'
+    id = Column(Integer, primary_key=True)                                  # id of the link
+    origin_id = Column(Integer, ForeignKey('nodes.id'))                     # id of the origin node
+    destination_id = Column(Integer, ForeignKey('nodes.id'))                # id of the destination node
+    description = Column(String)
 
-    def get(self):
-        return self.id
+    origin = relationship('Node', foreign_keys=[origin_id])
+    destination = relationship('Node', foreign_keys=[destination_id])
 
-class NodeDescription:
-    def __init__(self, descr: str=""):
-        self.descr = descr    # string
+    def __init__(self, origin, destination, description):
+        self.origin_id = origin.id
+        self.destination_id = destination.id
+        self.description = description
 
-    def set(self, descr):
-        self.descr = descr
+class Node(Base):
+    __tablename__ = 'nodes'
+    id = Column(Integer, primary_key=True)
+    level_id = Column(Integer, ForeignKey('levels.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    playcount = Column(Integer)
+    total_rating = Column(Integer)
+    ratings = Column(Integer)
+    description = Column(String)
 
-    def get(self):
-        return self.descr
+    level = relationship('Level')
+    user = relationship('User')
 
-class NodeLink:
-    def __init__(self, n=NodeId(), descr=NodeDescription()):
-        self.node = n                 
-        self.descr = descr 
-    
-    def get_node(self):
-        return self.node
-    
-    def get_description(self):
-        return self.descr.get()
+    def __init__(self, level: Level, user: User, description: str=""):
+        self.level = level  
+        self.user = user 
 
-class Node:
-    def __init__(self, level: Level, description: NodeDescription, user: User):
-        self.level = level                   
-        self.description = description   
-        self.user = user                     
-        self.id = NodeId()
-
-        # attributes that will change over time. we will need to model their functions
-        # so that they can deal with concurrent access.
-
-        # or maybe we can leave it to the database / API to deal with concurrent access
-        # because we will save them in a DB, right?
-        
-        self.previous = set()                
-        self.next = set()                 
+        # attributes that will change over time
         self.playcount = 0
-        self.rating = 0
+        self.total_rating = 0
+        self.ratings = 0                
+        self.description = description   
 
-    def link_next(self, node: 'Node', description: NodeDescription):
-        ''' link to next node '''
+    def link(self, node: 'Node', description: str, session: Session):
+        ''' link self to a next node '''
         if node == self:
             raise Exception("Cannot link node to itself")
         
-        self.next.add(NodeLink(node.id, description))
-        node.previous.add(NodeLink(self.id, description))
+        link = NodeLink(origin=self, destination=node, description=description)
+        session.add(link)  # add link to session
+        session.commit()   # commit    
 
-    def link_previous(self, node: 'Node', description: NodeDescription):
-        ''' link to next node '''
-        if node == self:
-            raise Exception("Cannot link node to itself")
-        
-        self.previous.add(NodeLink(node.id, description))
-        node.next.add(NodeLink(self.id, description))
-
-    def update_playcount(self):
+    def update_playcount(self, session: Session):
+        result = session.execute(
+            # execute update, will do later
+        )
         self.playcount += 1
+
+    def get_rating(self):
+        return round(self.total_rating / self.ratings, 1)
+    
+    def update_rating(self, rating: int):
+        self.total_rating += rating
+        self.ratings += 1
