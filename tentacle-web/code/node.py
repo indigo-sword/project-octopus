@@ -10,7 +10,7 @@ from user import User
         ## ^^ i chose this option btw
 
 from db_manager import Base, engine
-from sqlalchemy import Column, Integer, String, ForeignKe, update
+from sqlalchemy import Column, Integer, String, ForeignKey, update
 from sqlalchemy.orm import relationship, Session
 
 class NodeLink(Base):
