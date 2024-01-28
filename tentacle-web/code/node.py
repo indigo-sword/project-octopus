@@ -62,13 +62,28 @@ class Node(Base):
 
     def update_playcount(self, session: Session):
         result = session.execute(
-            # execute update, will do later
+            update(Node)
+            .where(Node.id == self.id)
+            .values(playcount=Node.playcount + 1)
+            .returning(Node.playcount)
         )
-        self.playcount += 1
+        
+        self.playcount = result.scalar()
+        session.commit()
+
+    def get_playcount(self):
+        return self.playcount
+    
+    def update_rating(self, rating: int, session: Session):
+        result = session.execute(
+            update(Node)
+            .where(Node.id == self.id)
+            .values(ratings=Node.ratings + 1, total_rating=Node.total_rating + rating)
+            .returning(Node.total_rating, Node.ratings)
+        )
+
+        self.total_rating, self.ratings = result.fetchone()
+        session.commit()
 
     def get_rating(self):
-        return round(self.total_rating / self.ratings, 1)
-    
-    def update_rating(self, rating: int):
-        self.total_rating += rating
-        self.ratings += 1
+        return round(self.total_rating / self.ratings, 1) if self.ratings > 0 else 0
