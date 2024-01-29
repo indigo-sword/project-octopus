@@ -8,8 +8,6 @@ Base.query = db_session.query_property()
 
 # this method will only run once, when the database is created
 def init_db():
+    import node, level, user
     Base.metadata.create_all(bind=engine)
     db_session.commit()
-
-if __name__ == "__main__":
-    init_db()

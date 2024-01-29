@@ -1,23 +1,16 @@
 from level import Level
 from user import User
+from uuid import uuid4
 
-# All of this code is not database-ready yet. 
-# we need to create code to initiate empty guys.
-# we need to create code to load, save, update and delete them to the database.
-
-# OR: we could use an ORM like SQLAlchemy to do this for us, so the objects will be
-# stored and we don't have to worry about it.
-        ## ^^ i chose this option btw
-
-from db_manager import Base, engine
+from db_manager import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, update
 from sqlalchemy.orm import relationship, Session
 
 class NodeLink(Base):
     __tablename__ = 'node_links'
-    id = Column(Integer, primary_key=True)                                  # id of the link
-    origin_id = Column(Integer, ForeignKey('nodes.id'))                     # id of the origin node
-    destination_id = Column(Integer, ForeignKey('nodes.id'))                # id of the destination node
+    id = Column(String, primary_key=True, default=str(uuid4()), unique=True) # id of the link
+    origin_id = Column(Integer, ForeignKey('nodes.id'))                      # id of the origin node
+    destination_id = Column(Integer, ForeignKey('nodes.id'))                 # id of the destination node
     description = Column(String)
 
     origin = relationship('Node', foreign_keys=[origin_id])
@@ -30,7 +23,7 @@ class NodeLink(Base):
 
 class Node(Base):
     __tablename__ = 'nodes'
-    id = Column(Integer, primary_key=True)
+    id = Column(String, primary_key=True, default=str(uuid4()), unique=True)
     level_id = Column(Integer, ForeignKey('levels.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     playcount = Column(Integer)
@@ -49,7 +42,15 @@ class Node(Base):
         self.playcount = 0
         self.total_rating = 0
         self.ratings = 0                
-        self.description = description   
+        self.description = description
+
+    def __repr__(self):
+        return "<Node(id='%s', level='<%s, %s>', user='<%s, %s, %s, %s>', playcount='%s', total_rating='%s', ratings='%s', description='%s')>" % (
+            self.id, self.level.id, self.level.level, self.user.id, self.user.username, self.user.password, self.user.email, self.playcount, self.total_rating, self.ratings, self.description)
+
+    def save(self, session: Session):
+        session.add(self) # add node to session
+        session.commit()
 
     def link(self, node: 'Node', description: str, session: Session):
         ''' link self to a next node '''
