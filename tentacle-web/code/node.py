@@ -3,7 +3,7 @@ from user import User
 from uuid import uuid4
 
 from db_manager import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, update
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update
 from sqlalchemy.orm import relationship, Session
 
 class NodeLink(Base):
@@ -27,8 +27,8 @@ class Node(Base):
     level_id = Column(Integer, ForeignKey('levels.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     playcount = Column(Integer)
-    total_rating = Column(Integer)
-    ratings = Column(Integer)
+    num_ratings = Column(Integer)
+    rating = Column(Double)
     description = Column(String)
 
     level = relationship('Level')
@@ -40,13 +40,13 @@ class Node(Base):
 
         # attributes that will change over time
         self.playcount = 0
-        self.total_rating = 0
-        self.ratings = 0                
+        self.num_ratings = 0
+        self.rating = 0                
         self.description = description
 
     def __repr__(self):
-        return "<Node(id='%s', level='<%s, %s>', user='<%s, %s, %s, %s>', playcount='%s', total_rating='%s', ratings='%s', description='%s')>" % (
-            self.id, self.level.id, self.level.level, self.user.id, self.user.username, self.user.password, self.user.email, self.playcount, self.total_rating, self.ratings, self.description)
+        return "<Node(id='%s', level='<%s, %s>', user='<%s, %s, %s, %s>', playcount='%s', num_ratings='%s', rating='%s', description='%s')>" % (
+            self.id, self.level.id, self.level.level, self.user.id, self.user.username, self.user.password, self.user.email, self.playcount, self.num_ratings, self.rating, self.description)
 
     def save(self, session: Session):
         session.add(self) # add node to session
@@ -79,12 +79,12 @@ class Node(Base):
         result = session.execute(
             update(Node)
             .where(Node.id == self.id)
-            .values(ratings=Node.ratings + 1, total_rating=Node.total_rating + rating)
-            .returning(Node.total_rating, Node.ratings)
+            .values(rating=(Node.rating * Node.num_ratings + rating) / (Node.num_ratings + 1), num_ratings=Node.num_ratings + 1)
+            .returning(Node.rating, Node.num_ratings)
         )
 
-        self.total_rating, self.ratings = result.fetchone()
+        self.rating, self.num_ratings = result.fetchone()
         session.commit()
 
     def get_rating(self):
-        return round(self.total_rating / self.ratings, 1) if self.ratings > 0 else 0
+        return round(self.rating, 2)
