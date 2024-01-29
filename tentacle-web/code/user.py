@@ -4,7 +4,7 @@ from uuid import uuid4
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True, default=str(uuid4()), unique=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
     username = Column(String)
     password = Column(String)
     email = Column(String)

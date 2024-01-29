@@ -23,7 +23,7 @@ class NodeLink(Base):
 
 class Node(Base):
     __tablename__ = 'nodes'
-    id = Column(String, primary_key=True, default=str(uuid4()), unique=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
     level_id = Column(Integer, ForeignKey('levels.id'))
     user_id = Column(Integer, ForeignKey('users.id'))
     playcount = Column(Integer)

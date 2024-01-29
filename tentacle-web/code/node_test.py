@@ -5,11 +5,9 @@ from db_manager import db_session
 from sqlalchemy import or_
 
 def save_test_node():
-    # RUN ONLY ONCE (already done)
-    testNode = Node(Level(1), User("joao", "idk", "jpireshe@nd.edu"), "test")
+    testNode = Node(Level(0), User("joao", "idk", "jpireshe@nd.edu"), "test")
     testNode.save(db_session)
     print("saved!", testNode)
-    # id: 6ae19566-4c03-4222-84e2-c84d0d2bb118
 
     return testNode.id
 
@@ -49,19 +47,17 @@ def test_link_nodes(id1: str, id2: str):
     print(result)
 
 def main():
-    testNodeId = "6ae19566-4c03-4222-84e2-c84d0d2bb118"
-    tnid = "66b1afb7-2a31-48ed-876a-76457335914d"
-    query_test_node(testNodeId)
-    edit_test_node_playcount(testNodeId)
-    edit_test_node_rating(testNodeId, 4)
-
-    # should raise an exception, nodes are already linked
-    # test_link_nodes(testNodeId, tnid)
-    # test_link_nodes(tnid, testNodeId)
+    id1 = save_test_node()
+    id2 = save_test_node()
+    query_test_node(id1)
+    edit_test_node_playcount(id1)
+    edit_test_node_rating(id1, 4)
 
     # will always work
-    tnid = save_test_node()
-    test_link_nodes(testNodeId, tnid)
+    test_link_nodes(id1, id2)
+
+    # will never work
+    test_link_nodes(id1, id2)
 
 if __name__ == "__main__":
     main()
