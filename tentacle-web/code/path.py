@@ -30,6 +30,8 @@ class Path(Base):
             .values(path_id=self.id, node_id=node.id, position=self.position)
         )
 
+        session.commit()
+
         self.position += 1
 
     def get_node_sequence(self, session: Session):
