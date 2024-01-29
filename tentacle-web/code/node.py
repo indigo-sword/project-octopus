@@ -3,7 +3,7 @@ from user import User
 from uuid import uuid4
 
 from db_manager import Base
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, update
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_
 from sqlalchemy.orm import relationship, Session
 
 class NodeLink(Base):
@@ -56,6 +56,17 @@ class Node(Base):
         ''' link self to a next node '''
         if node == self:
             raise Exception("Cannot link node to itself")
+        
+        # check if destination already has a link to self
+        result = session.query(NodeLink).filter(
+            or_(
+                (NodeLink.destination_id == self.id and NodeLink.origin_id == node.id),
+                (NodeLink.destination_id == node.id and NodeLink.origin_id == self.id)
+            )
+        ).all()
+        
+        if result:
+            raise Exception("Nodes are already linked.")
         
         link = NodeLink(origin=self, destination=node, description=description)
         session.add(link)  # add link to session

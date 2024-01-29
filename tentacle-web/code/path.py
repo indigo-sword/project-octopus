@@ -1,27 +1,16 @@
 from node import Node
-class PathId:
-    def __init__(self):
-        self.id = 0            # create an ID
+from uuid import uuid4
 
-    def get(self):
-        return self.id
-    
-class PathDescription:
-    def __init__(self, descr: str=""):
-        self.descr = descr    # string
-
-    def set(self, descr):
-        self.descr = descr
-
-    def get(self):
-        return self.descr
+from db_manager import Base
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update
+from sqlalchemy.orm import relationship, Session
 
 # paths WILL need to be stored in a DB.
 class Path:
-    def __init__(self):
-        self.id = PathId()
-        self.node_sequence = []
-        self.description = PathDescription()
+    __tablename__ = 'node_links'
+    def __init__(self, description: str=""):
+        self.node_id_sequence = []
+        self.description = description
 
     def add_node(self, node: Node):
-        self.node_sequence.append(node)
+        self.node_id_sequence.append(node.id)
