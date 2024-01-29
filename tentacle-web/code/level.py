@@ -18,3 +18,7 @@ class Level(Base):
         session.commit()
 
     # create / link level func needed
+
+# 1) save level file in tentacle-web/levels with level id as name
+# 2) create level object in db
+# 3) retrieve from db and send to client

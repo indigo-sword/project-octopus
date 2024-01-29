@@ -23,3 +23,6 @@ class User(Base):
         session.commit()
 
     # functions to get / update user info needed
+        
+# NEEDS TO MODEL FRIENDS
+        
