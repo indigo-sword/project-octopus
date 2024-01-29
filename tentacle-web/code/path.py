@@ -4,13 +4,18 @@ from uuid import uuid4
 from db_manager import Base
 from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, Table
 from sqlalchemy.orm import relationship, Session
+from user import User
 
 class Path(Base):
     __tablename__ = 'paths'
-    id = Column(String, primary_key=True, default=str(uuid4()), unique=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
     description = Column(String)
 
-    def __init__(self, description: str=""):
+    user = relationship('User')
+
+    def __init__(self, user: User, description: str=""):
+        self.user = user
         self.description = description
         self.position = 0
 
@@ -22,7 +27,8 @@ class Path(Base):
         node.save(session)
 
         # check for node in path
-        if session.query(path_node_association).filter(path_node_association.c.node_id == node.id).first() is not None:
+        q = session.query(path_node_association).filter(path_node_association.c.node_id == node.id).filter(path_node_association.c.path_id == self.id).first()
+        if q is not None:
             raise Exception("Node already in path")
         
         session.execute(

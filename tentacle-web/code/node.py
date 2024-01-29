@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship, Session
 
 class NodeLink(Base):
     __tablename__ = 'node_links'
-    id = Column(String, primary_key=True, default=str(uuid4()), unique=True) # id of the link
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True) # id of the link
     origin_id = Column(Integer, ForeignKey('nodes.id'))                      # id of the origin node
     destination_id = Column(Integer, ForeignKey('nodes.id'))                 # id of the destination node
     description = Column(String)

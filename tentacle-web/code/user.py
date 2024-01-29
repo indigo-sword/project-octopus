@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String
+from sqlalchemy.orm import Session
 from db_manager import Base
 from uuid import uuid4
 
@@ -13,3 +14,7 @@ class User(Base):
         self.username = username
         self.password = password
         self.email = email
+
+    def save(self, session: Session):
+        session.add(self)
+        session.commit()

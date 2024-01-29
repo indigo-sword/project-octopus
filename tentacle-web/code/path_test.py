@@ -4,8 +4,12 @@ from node import Node
 from level import Level
 from user import User
 
+u = User("NAME", "PASS", "EMAIL")
+u.save(db_session)
+print("===== USER =====", u.id)
+
 def new_path():
-    p = Path()
+    p = Path(u, "DESCRIPTION")
     p.save(db_session)
     print("saved!", p.id)
     return p
@@ -22,17 +26,25 @@ def main():
     p = new_path()
     test_query_path(p.id)
 
-    n = Node(Level(0), User("joao", "idk", "jpireshe@nd.edu"), "test")
+    n = Node(Level(0), u, "test")
     test_add_node(p, n)
 
-    n = Node(Level(0), User("joao", "idk", "jpireshe@nd.edu"), "test")
+    n = Node(Level(0), u, "test")
     test_add_node(p, n)
 
-    n = Node(Level(0), User("joao", "idk", "jpireshe@nd.edu"), "test")
+    n = Node(Level(0), u, "test")
     test_add_node(p, n)
 
     print("===== NODE SEQUENCE =====")
     print(p.get_node_sequence(db_session))
+
+    p2 = new_path()
+    test_add_node(p2, n) # should work
+    
+    print("===== NODE SEQUENCE =====")
+    print(p2.get_node_sequence(db_session))
+
+    test_add_node(p, n) # should not work
 
 if __name__ == "__main__":
     main()
