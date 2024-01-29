@@ -14,18 +14,17 @@ class Path(Base):
 
     user = relationship('User')
 
-    def __init__(self, user: User, description: str=""):
+    def __init__(self, session: Session, user: User, description: str=""):
         self.user = user
         self.description = description
         self.position = 0
+        self._save(session)
 
-    def save(self, session: Session):
+    def _save(self, session: Session):
         session.add(self)
         session.commit()
 
     def add_node(self, node: Node, session: Session):
-        node.save(session)
-
         # check for node in path
         q = session.query(path_node_association).filter(path_node_association.c.node_id == node.id).filter(path_node_association.c.path_id == self.id).first()
         if q is not None:

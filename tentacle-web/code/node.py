@@ -34,7 +34,7 @@ class Node(Base):
     level = relationship('Level')
     user = relationship('User')
 
-    def __init__(self, level: Level, user: User, description: str=""):
+    def __init__(self, session: Session, level: Level, user: User, description: str=""):
         self.level = level  
         self.user = user 
 
@@ -44,11 +44,13 @@ class Node(Base):
         self.rating = 0                
         self.description = description
 
+        self._save(session)
+
     def __repr__(self):
         return "<Node(id='%s', level='<%s, %s>', user='<%s, %s, %s, %s>', playcount='%s', num_ratings='%s', rating='%s', description='%s')>" % (
             self.id, self.level.id, self.level.level, self.user.id, self.user.username, self.user.password, self.user.email, self.playcount, self.num_ratings, self.rating, self.description)
 
-    def save(self, session: Session):
+    def _save(self, session: Session):
         session.add(self) # add node to session
         session.commit()
 
@@ -87,6 +89,9 @@ class Node(Base):
         return self.playcount
     
     def update_rating(self, rating: int, session: Session):
+        if rating < 0 or rating > 10:
+            raise Exception("Rating must be between 0 and 10")
+        
         result = session.execute(
             update(Node)
             .where(Node.id == self.id)

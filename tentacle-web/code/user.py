@@ -9,12 +9,17 @@ class User(Base):
     username = Column(String)
     password = Column(String)
     email = Column(String)
+    bio = Column(String)
 
-    def __init__(self, username: str, password: str, email: str):
+    def __init__(self, session: Session, username: str, password: str, email: str, bio: str=""):
         self.username = username
         self.password = password
         self.email = email
+        self.bio = bio
+        self._save(session)
 
-    def save(self, session: Session):
+    def _save(self, session: Session):
         session.add(self)
         session.commit()
+
+    # functions to get / update user info needed

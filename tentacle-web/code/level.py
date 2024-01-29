@@ -9,9 +9,12 @@ class Level(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
     level = Column(Integer)
 
-    def __init__(self, level: int=0):
+    def __init__(self, session: Session, level: int=0):
         self.level = level
+        self._save(session)
 
-    def save(self, session: Session):
+    def _save(self, session: Session):
         session.add(self)
         session.commit()
+
+    # create / link level func needed

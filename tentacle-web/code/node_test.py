@@ -5,8 +5,7 @@ from db_manager import db_session
 from sqlalchemy import or_
 
 def save_test_node():
-    testNode = Node(Level(0), User("joao", "idk", "jpireshe@nd.edu"), "test")
-    testNode.save(db_session)
+    testNode = Node(db_session, Level(db_session, 0), User(db_session, "NAME", "PASS", "EMAIL"), "DESC")
     print("saved!", testNode)
 
     return testNode.id
@@ -23,7 +22,7 @@ def edit_test_node_playcount(id: str):
 
 def edit_test_node_rating(id: str, rating: int):
     testNode = db_session.query(Node).filter(Node.id == f"{id}").first()
-    testNode.update_rating(4, db_session)
+    testNode.update_rating(rating, db_session)
     print("===== EDITED RATING =====", testNode)
     print(testNode.get_rating())
 
@@ -31,7 +30,7 @@ def test_link_nodes(id1: str, id2: str):
     testNodeOne = db_session.query(Node).filter(Node.id == f"{id1}").first()
     testNodeTwo = db_session.query(Node).filter(Node.id == f"{id2}").first()
 
-    print("====== TEST NODES ======")
+    print("====== TEST NODE LINKS ======")
     print(testNodeOne, "\n", testNodeTwo)
 
     testNodeOne.link(testNodeTwo, "some description", db_session)
@@ -49,10 +48,12 @@ def test_link_nodes(id1: str, id2: str):
 def main():
     id1 = save_test_node()
     id2 = save_test_node()
+
     query_test_node(id1)
     edit_test_node_playcount(id1)
     edit_test_node_rating(id1, 4)
-
+    edit_test_node_rating(id1, 5)
+    
     # will always work
     test_link_nodes(id1, id2)
 
