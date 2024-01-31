@@ -5,7 +5,8 @@ from db_manager import db_session
 from sqlalchemy import or_
 
 def save_test_node():
-    testNode = Node(db_session, Level(db_session, 0), User(db_session, "NAME", "PASS", "EMAIL"), "DESC")
+    u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+    testNode = Node(db_session, Level(db_session, u, b''), u, "DESC")
     print("saved!", testNode)
 
     return testNode.id
@@ -37,8 +38,8 @@ def test_link_nodes(id1: str, id2: str):
 
     result = db_session.query(NodeLink).filter(
             or_(
-                (NodeLink.destination_id == "6ae19566-4c03-4222-84e2-c84d0d2bb118" and NodeLink.origin_id == "66b1afb7-2a31-48ed-876a-76457335914d"),
-                (NodeLink.destination_id == "66b1afb7-2a31-48ed-876a-76457335914d" and NodeLink.origin_id == "6ae19566-4c03-4222-84e2-c84d0d2bb118")
+                (NodeLink.destination_id == id1 and NodeLink.origin_id == id2),
+                (NodeLink.destination_id == id2 and NodeLink.origin_id == id1)
             )
         ).all()
         

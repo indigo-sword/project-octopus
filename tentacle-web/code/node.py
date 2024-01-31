@@ -47,8 +47,7 @@ class Node(Base):
         self._save(session)
 
     def __repr__(self):
-        return "<Node(id='%s', level='<%s, %s>', user='<%s, %s, %s, %s>', playcount='%s', num_ratings='%s', rating='%s', description='%s')>" % (
-            self.id, self.level.id, self.level.level, self.user.id, self.user.username, self.user.password, self.user.email, self.playcount, self.num_ratings, self.rating, self.description)
+        return f"Node({self.id}, {self.level_id}, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description})"
 
     def _save(self, session: Session):
         session.add(self) # add node to session
