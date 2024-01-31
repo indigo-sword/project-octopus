@@ -42,6 +42,9 @@ class Path(Base):
     def get_node_sequence(self, session: Session):
         return session.query(path_node_association).filter(path_node_association.c.path_id == self.id).order_by(path_node_association.c.position).all()
     
+    def __repr__(self):
+        return f"Path({self.id}, {self.user_id}, {self.description})"
+    
 path_node_association = Table(
     'path_node_association',
     Base.metadata,

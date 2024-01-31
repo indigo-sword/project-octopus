@@ -24,13 +24,14 @@ def main():
     p = new_path()
     test_query_path(p.id)
 
-    n = Node(db_session, Level(db_session, 0), u, "test")
+    l = Level(db_session, u, b'')
+    n = Node(db_session, l, u, "test")
     test_add_node(p, n)
 
-    n = Node(db_session, Level(db_session, 0), u, "test")
+    n = Node(db_session, l, u, "test")
     test_add_node(p, n)
 
-    n = Node(db_session, Level(db_session, 0), u, "test")
+    n = Node(db_session, l, u, "test")
     test_add_node(p, n)
 
     print("===== NODE SEQUENCE =====")
