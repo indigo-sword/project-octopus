@@ -45,13 +45,12 @@ class Node(Base):
 
     def __init__(self, session: Session, level: Level, user: User, description: str=""):
         # attributes that will change over time
-        with session.begin():
-            self.level = level  
-            self.user = user 
-            self.playcount = 0
-            self.num_ratings = 0
-            self.rating = 0                
-            self.description = description
+        self.level = level  
+        self.user = user 
+        self.playcount = 0
+        self.num_ratings = 0
+        self.rating = 0                
+        self.description = description
 
         self.save(session)
 
@@ -81,15 +80,14 @@ class Node(Base):
         link = NodeLink(session, origin=self, destination=node, description=description)
 
     def update_playcount(self, session: Session):
-        with session.begin():
-            result = session.execute(
-                update(Node)
-                .where(Node.id == self.id)
-                .values(playcount=Node.playcount + 1)
-                .returning(Node.playcount)
-            )
-            
-            self.playcount = result.scalar()
+        result = session.execute(
+            update(Node)
+            .where(Node.id == self.id)
+            .values(playcount=Node.playcount + 1)
+            .returning(Node.playcount)
+        )
+        
+        self.playcount = result.scalar()
             
         session.commit()
 
@@ -100,15 +98,14 @@ class Node(Base):
         if rating < 0 or rating > 10:
             raise Exception("Rating must be between 0 and 10")
         
-        with session.begin():
-            result = session.execute(
-                update(Node)
-                .where(Node.id == self.id)
-                .values(rating=(Node.rating * Node.num_ratings + rating) / (Node.num_ratings + 1), num_ratings=Node.num_ratings + 1)
-                .returning(Node.rating, Node.num_ratings)
-            )
+        result = session.execute(
+            update(Node)
+            .where(Node.id == self.id)
+            .values(rating=(Node.rating * Node.num_ratings + rating) / (Node.num_ratings + 1), num_ratings=Node.num_ratings + 1)
+            .returning(Node.rating, Node.num_ratings)
+        )
 
-            self.rating, self.num_ratings = result.fetchone()
+        self.rating, self.num_ratings = result.fetchone()
             
         session.commit()
 

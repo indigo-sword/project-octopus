@@ -21,14 +21,13 @@ class Path(Base):
     user = relationship('User')
 
     def __init__(self, session: Session, user: User, description: str=""):
-        with session.begin():
-            self.user = user
-            self.description = description
-            self.position = 0
+        self.user = user
+        self.description = description
+        self.position = 0
 
-            self.playcount = 0
-            self.num_ratings = 0
-            self.rating = 0
+        self.playcount = 0
+        self.num_ratings = 0
+        self.rating = 0
 
         self.save(session)
 
@@ -42,13 +41,12 @@ class Path(Base):
         if q is not None:
             raise Exception("Node already in path")
         
-        with session.begin():
-            session.execute(
-                path_node_association.insert()
-                .values(path_id=self.id, node_id=node.id, position=self.position)
-            )
+        session.execute(
+            path_node_association.insert()
+            .values(path_id=self.id, node_id=node.id, position=self.position)
+        )
 
-            self.position += 1
+        self.position += 1
 
         session.commit()
 
@@ -59,15 +57,14 @@ class Path(Base):
         return f"Path({self.id}, {self.user_id}, {self.description}, {self.ts})"
     
     def update_playcount(self, session: Session):
-        with session.begin():
-            result = session.execute(
-                update(Path)
-                .where(Path.id == self.id)
-                .values(playcount=Path.playcount + 1)
-                .returning(Path.playcount)
-            )
-            
-            self.playcount = result.scalar()
+        result = session.execute(
+            update(Path)
+            .where(Path.id == self.id)
+            .values(playcount=Path.playcount + 1)
+            .returning(Path.playcount)
+        )
+        
+        self.playcount = result.scalar()
             
         session.commit()
 
@@ -78,15 +75,14 @@ class Path(Base):
         if rating < 0 or rating > 10:
             raise Exception("Rating must be between 0 and 10")
         
-        with session.begin():
-            result = session.execute(
-                update(Path)
-                .where(Path.id == self.id)
-                .values(rating=(Path.rating * Path.num_ratings + rating) / (Path.num_ratings + 1), num_ratings=Path.num_ratings + 1)
-                .returning(Path.rating, Path.num_ratings)
-            )
+        result = session.execute(
+            update(Path)
+            .where(Path.id == self.id)
+            .values(rating=(Path.rating * Path.num_ratings + rating) / (Path.num_ratings + 1), num_ratings=Path.num_ratings + 1)
+            .returning(Path.rating, Path.num_ratings)
+        )
 
-            self.rating, self.num_ratings = result.fetchone()
+        self.rating, self.num_ratings = result.fetchone()
             
         session.commit()
 

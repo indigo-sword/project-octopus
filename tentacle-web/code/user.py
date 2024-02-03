@@ -16,13 +16,12 @@ class User(Base):
     followers = Column(Integer)
 
     def __init__(self, session: Session, username: str, password: str, email: str, bio: str=""):
-        with session.begin():
-            self.username = username
-            self.password = password
-            self.email = email
-            self.bio = bio
-            self.following = 0
-            self.followers = 0
+        self.username = username
+        self.password = password
+        self.email = email
+        self.bio = bio
+        self.following = 0
+        self.followers = 0
         self._save(session)
 
     def _save(self, session: Session):
@@ -34,46 +33,41 @@ class User(Base):
     
     def update_bio(self, session: Session, bio: str):
         ''' update bio '''
-        with session.begin():
-            self.bio = bio
+        self.bio = bio
         self._save(session)
 
     def add_folower(self, session: Session):
         ''' update followers '''
-        with session.begin():
-            result = session.execute(
-                update(User)
-                .where(User.id == self.id)
-                .values(followers=User.followers + 1)
-                .returning(User.followers)
-            )
+        result = session.execute(
+            update(User)
+            .where(User.id == self.id)
+            .values(followers=User.followers + 1)
+            .returning(User.followers)
+        )
 
-            self.followers = result.scalar()
+        self.followers = result.scalar()
         self._save(session)
 
     def remove_follower(self, session: Session):
         ''' update followers '''
-        with session.begin():
-            result = session.execute(
-                update(User)
-                .where(User.id == self.id)
-                .values(followers=User.followers - 1)
-                .returning(User.followers)
-            )
+        result = session.execute(
+            update(User)
+            .where(User.id == self.id)
+            .values(followers=User.followers - 1)
+            .returning(User.followers)
+        )
 
-            self.followers = result.scalar()
+        self.followers = result.scalar()
         self._save(session)
 
     def add_following(self, session: Session):
         ''' update following '''
-        with session.begin():
-            self.following += 1
+        self.following += 1
         self._save(session)
 
     def remove_following(self, session: Session):
         ''' update following '''
-        with session.begin():
-            self.following -= 1
+        self.following -= 1
         self._save(session)
 
     def follow(self, session: Session, user: 'User'):
@@ -138,20 +132,18 @@ class Friendship(Base):
     user_two = relationship('User', foreign_keys=[user_two_id])
 
     def __init__(self, session: Session, user_one: User, user_two: User):
-        with session.begin():
-            self.user_one = user_one
-            self.user_one_id = user_one.id
-            
-            self.user_two = user_two
-            self.user_two_id = user_two.id
+        self.user_one = user_one
+        self.user_one_id = user_one.id
+        
+        self.user_two = user_two
+        self.user_two_id = user_two.id
 
-            self.status = 0 # pending
+        self.status = 0 # pending
 
         self._save(session)
 
     def accept(self, session: Session):
-        with session.begin():
-            self.status = 1 # accepted
+        self.status = 1 # accepted
         self._save(session)
 
     def reject(self, session: Session):
@@ -175,9 +167,8 @@ class Follow(Base):
     followed_user = relationship('User', foreign_keys=[followed])
 
     def __init__(self, session: Session, follower: User, followed: User):
-        with session.begin():
-            self.follower = follower.id
-            self.followed = followed.id
+        self.follower = follower.id
+        self.followed = followed.id
         self._save(session)
 
     def _save(self, session: Session):

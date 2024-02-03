@@ -16,8 +16,7 @@ class Level(Base):
 
     def __init__(self, session: Session, user: User, lvl_buf: bytes=b''):
         ''' lvl_buf is the level file '''
-        with session.begin():
-            self.user = user
+        self.user = user
         self.save(session)
         self._write_file(lvl_buf)
 
