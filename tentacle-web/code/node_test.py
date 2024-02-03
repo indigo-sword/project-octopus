@@ -54,12 +54,9 @@ def main():
     edit_test_node_playcount(id1)
     edit_test_node_rating(id1, 4)
     edit_test_node_rating(id1, 5)
-    
-    # will always work
-    test_link_nodes(id1, id2)
 
-    # will never work
-    test_link_nodes(id1, id2)
+    test_link_nodes(id1, id2) # should always work
+    test_link_nodes(id1, id2) # should never work
 
 if __name__ == "__main__":
     main()

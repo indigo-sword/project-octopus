@@ -2,14 +2,10 @@ import requests
 from uuid import uuid4
 import random
 import string
+import sys
 
-url = 'http://localhost:7809/'  # Replace with the actual URL and port of your Flask app
-
-# Data to be sent in the POST request
-data = {
-    'key1': 'value1',
-    'key2': 'value2'
-}
+port = sys.argv[1]
+url = f'http://localhost:{port}/'
 
 def random_email():
        return ''.join(random.choice(string.ascii_letters) for _ in range(10)) + "@gmail.com"
@@ -19,7 +15,11 @@ def test_base_get():
     print(response.json())
 
 def test_base_post():
-    response = requests.post(url, data=data)
+    response = requests.post(url, data={
+        "key1": "value1",
+        "key2": "value2",
+    
+    })
     print(response.json())
 
 def test_create_user():
@@ -29,13 +29,15 @@ def test_create_user():
         "email": random_email(),
     })
 
+    print(response.json())
+
 def test_base():
     test_base_get()
     test_base_post()
 
 def main():
     test_base()
-    test_create_user
+    test_create_user()
 
 if __name__ == "__main__":
     main()

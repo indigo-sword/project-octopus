@@ -3,8 +3,9 @@ from user import User
 from uuid import uuid4
 
 from db_manager import Base
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_, DateTime
 from sqlalchemy.orm import relationship, Session
+from datetime import datetime
 
 class NodeLink(Base):
     __tablename__ = 'node_links'
@@ -12,14 +13,21 @@ class NodeLink(Base):
     origin_id = Column(Integer, ForeignKey('nodes.id'))                      # id of the origin node
     destination_id = Column(Integer, ForeignKey('nodes.id'))                 # id of the destination node
     description = Column(String)
+    ts = Column(DateTime, default=datetime.utcnow)
 
     origin = relationship('Node', foreign_keys=[origin_id])
     destination = relationship('Node', foreign_keys=[destination_id])
 
-    def __init__(self, origin, destination, description):
+    def __init__(self, session: Session, origin: 'Node', destination: 'Node', description: str):
         self.origin_id = origin.id
         self.destination_id = destination.id
         self.description = description
+
+        self.save(session)
+
+    def save(self, session: Session):
+        session.add(self)
+        session.commit()
 
 class Node(Base):
     __tablename__ = 'nodes'
@@ -30,26 +38,27 @@ class Node(Base):
     num_ratings = Column(Integer)
     rating = Column(Double)
     description = Column(String)
+    ts = Column(DateTime, default=datetime.utcnow)
 
     level = relationship('Level')
     user = relationship('User')
 
     def __init__(self, session: Session, level: Level, user: User, description: str=""):
-        self.level = level  
-        self.user = user 
-
         # attributes that will change over time
-        self.playcount = 0
-        self.num_ratings = 0
-        self.rating = 0                
-        self.description = description
+        with session.begin():
+            self.level = level  
+            self.user = user 
+            self.playcount = 0
+            self.num_ratings = 0
+            self.rating = 0                
+            self.description = description
 
-        self._save(session)
+        self.save(session)
 
     def __repr__(self):
-        return f"Node({self.id}, {self.level_id}, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description})"
+        return f"Node({self.id}, {self.level_id}, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description}, {self.ts})"
 
-    def _save(self, session: Session):
+    def save(self, session: Session):
         session.add(self) # add node to session
         session.commit()
 
@@ -69,19 +78,19 @@ class Node(Base):
         if result:
             raise Exception("Nodes are already linked.")
         
-        link = NodeLink(origin=self, destination=node, description=description)
-        session.add(link)  # add link to session
-        session.commit()   # commit    
+        link = NodeLink(session, origin=self, destination=node, description=description)
 
     def update_playcount(self, session: Session):
-        result = session.execute(
-            update(Node)
-            .where(Node.id == self.id)
-            .values(playcount=Node.playcount + 1)
-            .returning(Node.playcount)
-        )
-        
-        self.playcount = result.scalar()
+        with session.begin():
+            result = session.execute(
+                update(Node)
+                .where(Node.id == self.id)
+                .values(playcount=Node.playcount + 1)
+                .returning(Node.playcount)
+            )
+            
+            self.playcount = result.scalar()
+            
         session.commit()
 
     def get_playcount(self):
@@ -91,14 +100,16 @@ class Node(Base):
         if rating < 0 or rating > 10:
             raise Exception("Rating must be between 0 and 10")
         
-        result = session.execute(
-            update(Node)
-            .where(Node.id == self.id)
-            .values(rating=(Node.rating * Node.num_ratings + rating) / (Node.num_ratings + 1), num_ratings=Node.num_ratings + 1)
-            .returning(Node.rating, Node.num_ratings)
-        )
+        with session.begin():
+            result = session.execute(
+                update(Node)
+                .where(Node.id == self.id)
+                .values(rating=(Node.rating * Node.num_ratings + rating) / (Node.num_ratings + 1), num_ratings=Node.num_ratings + 1)
+                .returning(Node.rating, Node.num_ratings)
+            )
 
-        self.rating, self.num_ratings = result.fetchone()
+            self.rating, self.num_ratings = result.fetchone()
+            
         session.commit()
 
     def get_rating(self):

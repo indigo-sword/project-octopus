@@ -1,23 +1,24 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship, Session
 from db_manager import Base
 from uuid import uuid4
 import os
 from user import User
-
-from sqlalchemy.orm import Session
+from datetime import datetime
 
 class Level(Base):
     __tablename__ = 'levels'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
     user_id = Column(Integer, ForeignKey('users.id'))
+    ts = Column(DateTime, default=datetime.utcnow)
 
     user = relationship('User')
 
     def __init__(self, session: Session, user: User, lvl_buf: bytes=b''):
         ''' lvl_buf is the level file '''
-        self.user = user
-        self._save(session)
+        with session.begin():
+            self.user = user
+        self.save(session)
         self._write_file(lvl_buf)
 
     def _write_file(self, lvl_buf: bytes):
@@ -37,5 +38,5 @@ class Level(Base):
         return root + "/levels/" + self.id + ".level"
     
     def __repr__(self):
-        return f"Level({self.id}, {self.user_id})"
+        return f"Level({self.id}, {self.user_id}, {self.ts})"
     
