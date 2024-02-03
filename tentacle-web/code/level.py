@@ -26,7 +26,7 @@ class Level(Base):
         f = open(self.get_file_path(), 'wb')
         f.write(lvl_buf)
 
-    def _save(self, session: Session):
+    def save(self, session: Session):
         session.add(self)
         session.commit()
 
