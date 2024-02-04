@@ -18,7 +18,7 @@ def create_user():
 
 @app.route("/change_user_bio", methods=["POST"])
 def change_user_bio():
-    print(request.form)
+    return change_user_bio_func(request.form["username"], request.form["bio"])
 
 if __name__ == "__main__":
     app.run(host='localhost', port=7809)
