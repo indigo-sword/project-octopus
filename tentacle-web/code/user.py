@@ -7,9 +7,9 @@ from datetime import datetime
 class User(Base):
     __tablename__ = 'users'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    username = Column(String)
+    username = Column(String, unique=True)
     password = Column(String)
-    email = Column(String)
+    email = Column(String, unique=True)
     bio = Column(String)
     ts = Column(DateTime, default=datetime.utcnow)
     following = Column(Integer)

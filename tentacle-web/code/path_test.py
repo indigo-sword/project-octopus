@@ -1,11 +1,16 @@
 from path import Path
 from db_manager import db_session
 from node import Node
-from level import Level
 from user import User
 import unittest
+from uuid import uuid4
+import random
+import string
 
-u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+def random_email():
+    return ''.join(random.choice(string.ascii_letters) for _ in range(10)) + "@gmail.com"
+
+u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
 
 class TestPath(unittest.TestCase):
     def test_create_path(self):
@@ -16,8 +21,7 @@ class TestPath(unittest.TestCase):
         self.assertEqual(p2.id, p.id)
 
     def test_add_node(self):
-        l = Level(db_session, u, b'')
-        n = Node(db_session, l, u, "test")
+        n = Node(db_session, u, "test", b'LEVEL')
 
         p = Path(db_session, u, "DESCRIPTION")
         p.add_node(n, db_session)
@@ -32,8 +36,7 @@ class TestPath(unittest.TestCase):
             p.add_node(n, db_session)
 
     def test_add_node_to_two_diff_paths(self):
-        l = Level(db_session, u, b'')
-        n = Node(db_session, l, u, "test")
+        n = Node(db_session, u, "test", b'LEVEL')
 
         p = Path(db_session, u, "DESCRIPTION")
         p.add_node(n, db_session)

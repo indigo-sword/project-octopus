@@ -18,4 +18,5 @@ def create_user_func(username, password, email):
     # create user
     u = User(db_session, username, password, email)
 
-    return {"message": "user created", "user_id": u.id}, 201
+    return {"message": "User created", "user_id": u.id}, 201
+

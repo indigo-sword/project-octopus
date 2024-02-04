@@ -14,8 +14,7 @@ def index():
 
 @app.route("/create_user", methods=["POST"])
 def create_user():
-    m, code = create_user_func(request.form["username"], request.form["password"], request.form["email"])
-    return m, code
+    return create_user_func(request.form["username"], request.form["password"], request.form["email"])
 
 @app.route("/change_user_bio", methods=["POST"])
 def change_user_bio():
