@@ -36,7 +36,7 @@ class User(Base):
         self.bio = bio
         self._save(session)
 
-    def add_folower(self, session: Session):
+    def add_follower(self, session: Session):
         ''' update followers '''
         result = session.execute(
             update(User)
@@ -73,7 +73,7 @@ class User(Base):
     def follow(self, session: Session, user: 'User'):
         ''' follow user '''
         Follow(session, self, user)
-        user.add_folower(session)
+        user.add_follower(session)
         self.add_following(session)
 
     def unfollow(self, session: Session, user: 'User'):
@@ -178,5 +178,8 @@ class Follow(Base):
     def unfollow(self, session: Session):
         session.delete(self)
         session.commit()
+
+    def __repr__(self):
+        return f"Follow({self.id}, {self.follower}, {self.followed})"
 
     

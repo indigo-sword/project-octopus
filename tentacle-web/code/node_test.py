@@ -3,60 +3,63 @@ from level import Level
 from user import User
 from db_manager import db_session
 from sqlalchemy import or_
+import unittest
 
-def save_test_node():
-    u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
-    testNode = Node(db_session, Level(db_session, u, b''), u, "DESC")
-    print("saved!", testNode)
+class TestNode(unittest.TestCase):
+    def test_save_node(self):
+        u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+        testNode = Node(db_session, Level(db_session, u, b''), u, "DESC")
+        self.assertIsNotNone(testNode.id)
 
-    return testNode.id
+        t = db_session.query(Node).filter(Node.id == testNode.id).first()
+        self.assertIsNotNone(t)
 
-def query_test_node(id: str):
-    testNode = db_session.query(Node).filter(Node.id == f"{id}").first()
-    print("===== QUERIED =====", testNode)
+    def test_link(self):
+        u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+        testNodeOne = Node(db_session, Level(db_session, u, b''), u, "DESC")
+        testNodeTwo = Node(db_session, Level(db_session, u, b''), u, "DESC")
 
-def edit_test_node_playcount(id: str):
-    testNode = db_session.query(Node).filter(Node.id == f"{id}").first()
-    testNode.update_playcount(db_session)
-    print("===== EDITED PLAYCOUNT =====", testNode)
-    print(testNode.get_playcount())
+        testNodeOne.link(testNodeTwo, "some description", db_session)
 
-def edit_test_node_rating(id: str, rating: int):
-    testNode = db_session.query(Node).filter(Node.id == f"{id}").first()
-    testNode.update_rating(rating, db_session)
-    print("===== EDITED RATING =====", testNode)
-    print(testNode.get_rating())
-
-def test_link_nodes(id1: str, id2: str):
-    testNodeOne = db_session.query(Node).filter(Node.id == f"{id1}").first()
-    testNodeTwo = db_session.query(Node).filter(Node.id == f"{id2}").first()
-
-    print("====== TEST NODE LINKS ======")
-    print(testNodeOne, "\n", testNodeTwo)
-
-    testNodeOne.link(testNodeTwo, "some description", db_session)
-
-    result = db_session.query(NodeLink).filter(
+        result = db_session.query(NodeLink).filter(
             or_(
-                (NodeLink.destination_id == id1 and NodeLink.origin_id == id2),
-                (NodeLink.destination_id == id2 and NodeLink.origin_id == id1)
+                (NodeLink.destination_id == testNodeOne.id and NodeLink.origin_id == testNodeTwo.id),
+                (NodeLink.destination_id == testNodeTwo.id and NodeLink.origin_id == testNodeOne.id)
             )
         ).all()
         
-    print("====== RESULT ======")
-    print(result)
+        self.assertIsNotNone(result)
+
+    def test_link_fail(self):
+        u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+        testNodeOne = Node(db_session, Level(db_session, u, b''), u, "DESC")
+        testNodeTwo = Node(db_session, Level(db_session, u, b''), u, "DESC")
+
+        testNodeOne.link(testNodeTwo, "some description", db_session)
+
+        with self.assertRaises(Exception):
+            testNodeOne.link(testNodeTwo, "some description", db_session)
+
+    def test_update_playcount(self):
+        u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+        testNode = Node(db_session, Level(db_session, u, b''), u, "DESC")
+        testNode.update_playcount(db_session)
+        self.assertEqual(testNode.get_playcount(), 1)
+
+        playcount = db_session.query(Node).filter(Node.id == testNode.id).first().playcount
+        self.assertEqual(playcount, 1)
+
+    def test_update_rating(self):
+        u = User(db_session, "NAME", "PASS", "EMAIL", "BIO")
+        testNode = Node(db_session, Level(db_session, u, b''), u, "DESC")
+        testNode.update_rating(5, db_session)
+        self.assertEqual(testNode.get_rating(), 5)
+
+        rating = db_session.query(Node).filter(Node.id == testNode.id).first().rating
+        self.assertEqual(rating, 5)
 
 def main():
-    id1 = save_test_node()
-    id2 = save_test_node()
-
-    query_test_node(id1)
-    edit_test_node_playcount(id1)
-    edit_test_node_rating(id1, 4)
-    edit_test_node_rating(id1, 5)
-
-    test_link_nodes(id1, id2) # should always work
-    test_link_nodes(id1, id2) # should never work
+    unittest.main()
 
 if __name__ == "__main__":
     main()

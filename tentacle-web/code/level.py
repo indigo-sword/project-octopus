@@ -24,6 +24,7 @@ class Level(Base):
         # create level file based on some variable passed here (will do tests later w/ api)
         f = open(self.get_file_path(), 'wb')
         f.write(lvl_buf)
+        f.close()
 
     def save(self, session: Session):
         session.add(self)
