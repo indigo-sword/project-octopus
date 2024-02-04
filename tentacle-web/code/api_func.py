@@ -27,4 +27,3 @@ def change_user_bio_func(username: str, bio: str):
     
     u.update_bio(db_session, bio)
     return {"message": "User bio updated", "bio": bio}, 200
-
