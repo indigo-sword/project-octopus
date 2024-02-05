@@ -97,8 +97,7 @@ class TestUser(unittest.TestCase):
 
         f = u.get_friends(db_session)
         self.assertEqual(len(f), 1)
-        self.assertEqual(f[0].friend_one, u.username)
-        self.assertEqual(f[0].friend_two, u2.username)
+        self.assertEqual(f[0], u2.username)
 
     def test_get_friend_requests(self):
         u = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
@@ -108,8 +107,7 @@ class TestUser(unittest.TestCase):
 
         f = u2.get_friend_requests(db_session)
         self.assertEqual(len(f), 1)
-        self.assertEqual(f[0].friend_one, u.username)
-        self.assertEqual(f[0].friend_two, u2.username)
+        self.assertEqual(f[0], u.username)
 
     def test_get_friend_requests_sent(self):
         u = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
@@ -119,8 +117,7 @@ class TestUser(unittest.TestCase):
 
         f = u.get_friend_requests_sent(db_session)
         self.assertEqual(len(f), 1)
-        self.assertEqual(f[0].friend_one, u.username)
-        self.assertEqual(f[0].friend_two, u2.username)
+        self.assertEqual(f[0], u2.username)
 
     def test_accept_friend_request(self):
         u = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
@@ -175,6 +172,35 @@ class TestFriendship(unittest.TestCase):
         f = db_session.query(Friendship).filter(Friendship.friend_one == u1.username).filter(Friendship.friend_two == u2.username).first()
         self.assertEqual(f.status, 1)
 
+class TestFollow(unittest.TestCase):
+    def test_create_follow(self):
+        u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
+        u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
+
+        f = Follow(db_session, u1, u2)
+        self.assertEqual(f.follower, u1.username)
+        self.assertEqual(f.followed, u2.username)
+
+        f = db_session.query(Follow).filter(Follow.follower == u1.username).filter(Follow.followed == u2.username).first()
+        self.assertIsNotNone(f)
+
+    def test_unfollow(self):
+        u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
+        u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
+
+        u1.follow(db_session, u2)
+        u1.unfollow(db_session, u2)
+
+        f = db_session.query(Follow).filter(Follow.follower == u1.username).filter(Follow.followed == u2.username).first()
+        self.assertIsNone(f)
+
+    def test_unfollow_fail_no_follow(self):
+        u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
+        u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
+
+        with self.assertRaises(Exception):
+            u1.unfollow(db_session, u2)
+
     def test_reject(self):
         u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
         u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
@@ -195,28 +221,6 @@ class TestFriendship(unittest.TestCase):
         self.assertEqual(u1.get_following(db_session), [])
         self.assertEqual(u2.get_followers(db_session), [])
         self.assertEqual(u2.get_following(db_session), [u1.username])
-
-class TestFollow(unittest.TestCase):
-    def test_create_follow(self):
-        u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
-        u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
-
-        f = Follow(db_session, u1, u2)
-        self.assertEqual(f.follower, u1.username)
-        self.assertEqual(f.followed, u2.username)
-
-        f = db_session.query(Follow).filter(Follow.follower == u1.username).filter(Follow.followed == u2.username).first()
-        self.assertIsNotNone(f)
-
-    def test_unfollow(self):
-        u1 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO")
-        u2 = User(db_session, random_username(), "PASS", random_email(), "SOME BIO2")
-
-        f = Follow(db_session, u1, u2)
-        f.unfollow(db_session)
-
-        f = db_session.query(Follow).filter(Follow.follower == u1.username).filter(Follow.followed == u2.username).first()
-        self.assertIsNone(f)
 
 def main():
     unittest.main()

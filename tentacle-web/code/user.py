@@ -94,15 +94,15 @@ class User(Base):
     
     def get_friends(self, session: Session):
         ''' returns list of friends of the user '''
-        return session.query(Friendship).filter(or_(Friendship.friend_one == self.username, Friendship.friend_two == self.username)).filter(Friendship.status == 1).all()
+        return [friendship.friend_one if friendship.friend_one != self.username else friendship.friend_two for friendship in session.query(Friendship).filter(or_(Friendship.friend_one == self.username, Friendship.friend_two == self.username)).filter(Friendship.status == 1).all()]
 
     def get_friend_requests(self, session: Session):
         ''' returns list of friend requests made to the user '''
-        return session.query(Friendship).filter(Friendship.friend_two == self.username).filter(Friendship.status == 0).all()
+        return [friendship.friend_one for friendship in session.query(Friendship).filter(Friendship.friend_two == self.username).filter(Friendship.status == 0).all()]
     
     def get_friend_requests_sent(self, session: Session):
         ''' returns list of friend requests made by the user '''
-        return session.query(Friendship).filter(Friendship.friend_one == self.username).filter(Friendship.status == 0).all()
+        return [friendship.friend_two for friendship in session.query(Friendship).filter(Friendship.friend_one == self.username).filter(Friendship.status == 0).all()]
     
     def accept_friend_request(self, session: Session, friend: 'User'):
         ''' accepts friend request from friend '''
