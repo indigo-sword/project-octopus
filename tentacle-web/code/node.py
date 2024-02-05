@@ -32,7 +32,7 @@ class NodeLink(Base):
 class Node(Base):
     __tablename__ = 'nodes'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.username'))
     playcount = Column(Integer)
     num_ratings = Column(Integer)
     rating = Column(Double)

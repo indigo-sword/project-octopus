@@ -6,8 +6,7 @@ from datetime import datetime
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    username = Column(String, unique=True)
+    username = Column(String, unique=True, primary_key=True, index=True)
     password = Column(String)
     email = Column(String, unique=True)
     bio = Column(String)
@@ -40,7 +39,7 @@ class User(Base):
         ''' update followers '''
         result = session.execute(
             update(User)
-            .where(User.id == self.id)
+            .where(User.username == self.username)
             .values(followers=User.followers + 1)
             .returning(User.followers)
         )
@@ -52,7 +51,7 @@ class User(Base):
         ''' update followers '''
         result = session.execute(
             update(User)
-            .where(User.id == self.id)
+            .where(User.username == self.username)
             .values(followers=User.followers - 1)
             .returning(User.followers)
         )
@@ -78,34 +77,42 @@ class User(Base):
 
     def unfollow(self, session: Session, user: 'User'):
         # check for existing follow
-        f = session.query(Follow).filter(Follow.follower == self.id).filter(Follow.followed == user.id).first()
+        f = session.query(Follow).filter(Follow.follower == self.username).filter(Follow.followed == user.username).first()
         if not f: raise Exception("User is not being followed")
 
         f.unfollow(session)
         user.remove_follower(session)
         self.remove_following(session)
+
+    def get_following(self, session: Session):
+        ''' returns list of users being followed by the user '''
+        return [follow.followed for follow in session.query(Follow).filter(Follow.follower == self.username).all()]
+    
+    def get_followers(self, session: Session):
+        ''' returns list of users following the user '''
+        return [follow.follower for follow in session.query(Follow).filter(Follow.followed == self.username).all()]
     
     def get_friends(self, session: Session):
         ''' returns list of friends of the user '''
-        return session.query(Friendship).filter(or_(Friendship.user_one_id == self.id, Friendship.user_two_id == self.id)).filter(Friendship.status == 1).all()
+        return session.query(Friendship).filter(or_(Friendship.friend_one == self.username, Friendship.friend_two == self.username)).filter(Friendship.status == 1).all()
 
     def get_friend_requests(self, session: Session):
         ''' returns list of friend requests made to the user '''
-        return session.query(Friendship).filter(Friendship.user_two_id == self.id).filter(Friendship.status == 0).all()
+        return session.query(Friendship).filter(Friendship.friend_two == self.username).filter(Friendship.status == 0).all()
     
     def get_friend_requests_sent(self, session: Session):
         ''' returns list of friend requests made by the user '''
-        return session.query(Friendship).filter(Friendship.user_one_id == self.id).filter(Friendship.status == 0).all()
+        return session.query(Friendship).filter(Friendship.friend_one == self.username).filter(Friendship.status == 0).all()
     
     def accept_friend_request(self, session: Session, friend: 'User'):
         ''' accepts friend request from friend '''
-        f = session.query(Friendship).filter(Friendship.user_one_id == friend.id).filter(Friendship.user_two_id == self.id).first()
+        f = session.query(Friendship).filter(Friendship.friend_one == friend.username).filter(Friendship.friend_two == self.username).first()
         if not f: raise Exception("No friend request from this user")
         f.accept(session)
 
     def reject_friend_request(self, session: Session, friend: 'User'):
         ''' rejects friend request from friend '''
-        f = session.query(Friendship).filter(Friendship.user_one_id == friend.id).filter(Friendship.user_two_id == self.id).first()
+        f = session.query(Friendship).filter(Friendship.friend_one == friend.username).filter(Friendship.friend_two == self.username).first()
         if not f: raise Exception("No friend request from this user")
         f.reject(session)
 
@@ -116,27 +123,24 @@ class User(Base):
 
     def remove_friend(self, session: Session, friend: 'User'):
         ''' removes friend '''
-        f = session.query(Friendship).filter(Friendship.user_one_id == self.id).filter(Friendship.user_two_id == friend.id).first()
+        f = session.query(Friendship).filter(Friendship.friend_one == self.username).filter(Friendship.friend_two == friend.username).first()
         if not f: raise Exception("User is not a friend")
         f.reject(session)
         
 class Friendship(Base):
     __tablename__ = 'friendships'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    user_one_id = Column(String, ForeignKey('users.id'))
-    user_two_id = Column(String, ForeignKey('users.id'))
+    friend_one = Column(String, ForeignKey('users.username'))
+    friend_two = Column(String, ForeignKey('users.username'))
     status = Column(Integer)
     ts = Column(DateTime, default=datetime.utcnow)
 
-    user_one = relationship('User', foreign_keys=[user_one_id])
-    user_two = relationship('User', foreign_keys=[user_two_id])
+    user_one = relationship('User', foreign_keys=[friend_one])
+    user_two = relationship('User', foreign_keys=[friend_two])
 
     def __init__(self, session: Session, user_one: User, user_two: User):
-        self.user_one = user_one
-        self.user_one_id = user_one.id
-        
-        self.user_two = user_two
-        self.user_two_id = user_two.id
+        self.friend_one = user_one.username
+        self.friend_two = user_two.username
 
         self.status = 0 # pending
 
@@ -155,20 +159,20 @@ class Friendship(Base):
         session.commit()
 
     def __repr__(self):
-        return f"Friendship({self.id}, {self.user_one.id}, {self.user_two.id})"
+        return f"Friendship({self.id}, {self.friend_one}, {self.friend_two}, {self.status})"
     
 class Follow(Base):
     __tablename__ = 'follows'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    follower = Column(String, ForeignKey('users.id'))
-    followed = Column(String, ForeignKey('users.id'))
+    follower = Column(String, ForeignKey('users.username'))
+    followed = Column(String, ForeignKey('users.username'))
 
     follower_user = relationship('User', foreign_keys=[follower])
     followed_user = relationship('User', foreign_keys=[followed])
 
     def __init__(self, session: Session, follower: User, followed: User):
-        self.follower = follower.id
-        self.followed = followed.id
+        self.follower = follower.username
+        self.followed = followed.username
         self._save(session)
 
     def _save(self, session: Session):

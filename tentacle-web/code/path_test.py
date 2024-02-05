@@ -15,7 +15,7 @@ u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
 class TestPath(unittest.TestCase):
     def test_create_path(self):
         p = Path(db_session, u, "DESCRIPTION")
-        self.assertEqual(p.user_id, u.id)
+        self.assertEqual(p.user_id, u.username)
         
         p2 = db_session.query(Path).filter(Path.id == p.id).first()
         self.assertEqual(p2.id, p.id)

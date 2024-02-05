@@ -10,7 +10,7 @@ from datetime import datetime
 class Path(Base):
     __tablename__ = 'paths'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.username'))
     description = Column(String)
     ts = Column(DateTime, default=datetime.utcnow)
 
