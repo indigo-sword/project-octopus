@@ -1,19 +1,36 @@
-Ok, so what we want to have is a sequence of nodes like this:
+What we want have is a sequence of nodes like this:
 
-![Alt text](image.png)
+![Nodes connected. Their incoming degree might be of 1 or more. No self loops.](images/graph.png)
 
-Where path N1 N2 N3 N4 N5 will be path #1, path N1 N6 N7 N4 N5 will be path #2,
-and path N1 N6 N8 N9 will be path #3.
+We can see different paths: N1 - N2, N1 - N4 - N2, N1 - N4 - N5 - N3 - N6, N1 - N3 - N6.
+Each path is made of different Nodes (that's why we have N[n] for the nodes in the graph).
 
-The link between each node should have a description put by the creator
+**Each path has:**
 
-We should save the path names, alongside their owner / creator, description, in some kind of database.
--- Where are we going to save the levels??
+- a description
+- an owner (from the User class)
+- a playcount
+- a rating
 
-To create new path IDs, we should go through a centralized queue that will receive them. We don't want just to create
-the IDs instantly to avoid paths with same name.
+**Each node has:**
 
-We do need:
+- a description
+- an owner (from the User class)
+- a playcount
+- a rating
+- connections to other nodes, in the NodeLink class.
 
-- a level database. Somehow store the level somewhere, store its node id there.
-- a node database. Store node id, and its info. Should not be hard.
+**Each user has:**
+
+- a bio
+- an username
+- a password (hashed)
+- an email
+- follows
+- friends
+
+**How we are creating this:**
+
+- Nodes: we store nodes in a db table, and their links (many to many) in another one.
+- Paths: we have paths with their info in a table, and a many to many table with the sequence of nodes in each path
+- Users: we store them in a DB table, their friends in a many to many table and their followers similarly
