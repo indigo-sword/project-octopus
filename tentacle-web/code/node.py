@@ -1,10 +1,11 @@
-from level import Level
 from user import User
 from uuid import uuid4
+import os
 
 from db_manager import Base
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_, DateTime
 from sqlalchemy.orm import relationship, Session
+from datetime import datetime
 
 class NodeLink(Base):
     __tablename__ = 'node_links'
@@ -12,44 +13,62 @@ class NodeLink(Base):
     origin_id = Column(Integer, ForeignKey('nodes.id'))                      # id of the origin node
     destination_id = Column(Integer, ForeignKey('nodes.id'))                 # id of the destination node
     description = Column(String)
+    ts = Column(DateTime, default=datetime.utcnow)
 
     origin = relationship('Node', foreign_keys=[origin_id])
     destination = relationship('Node', foreign_keys=[destination_id])
 
-    def __init__(self, origin, destination, description):
+    def __init__(self, session: Session, origin: 'Node', destination: 'Node', description: str):
         self.origin_id = origin.id
         self.destination_id = destination.id
         self.description = description
 
+        self.save(session)
+
+    def save(self, session: Session):
+        session.add(self)
+        session.commit()
+
 class Node(Base):
     __tablename__ = 'nodes'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    level_id = Column(Integer, ForeignKey('levels.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.username'))
     playcount = Column(Integer)
     num_ratings = Column(Integer)
     rating = Column(Double)
     description = Column(String)
+    ts = Column(DateTime, default=datetime.utcnow)
 
-    level = relationship('Level')
     user = relationship('User')
 
-    def __init__(self, session: Session, level: Level, user: User, description: str=""):
-        self.level = level  
-        self.user = user 
-
+    def __init__(self, session: Session, user: User, description: str="", lvl_buf: bytes=b''):
         # attributes that will change over time
+        self.user = user 
         self.playcount = 0
         self.num_ratings = 0
         self.rating = 0                
         self.description = description
 
-        self._save(session)
+        self.save(session)
+        self._write_file(lvl_buf)
+
+    def _write_file(self, lvl_buf: bytes):
+        # create level file based on some variable passed here (will do tests later w/ api)
+        f = open(self.get_file_path(), 'wb')
+        f.write(lvl_buf)
+        f.close()
+
+    def get_file_path(self):
+        # get project root
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        # go to /levels/self.id.level
+        return root + "/levels/" + self.id + ".level"
 
     def __repr__(self):
-        return f"Node({self.id}, {self.level_id}, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description})"
+        return f"Node({self.id},, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description}, {self.ts})"
 
-    def _save(self, session: Session):
+    def save(self, session: Session):
         session.add(self) # add node to session
         session.commit()
 
@@ -69,9 +88,7 @@ class Node(Base):
         if result:
             raise Exception("Nodes are already linked.")
         
-        link = NodeLink(origin=self, destination=node, description=description)
-        session.add(link)  # add link to session
-        session.commit()   # commit    
+        link = NodeLink(session, origin=self, destination=node, description=description)
 
     def update_playcount(self, session: Session):
         result = session.execute(
@@ -82,6 +99,7 @@ class Node(Base):
         )
         
         self.playcount = result.scalar()
+            
         session.commit()
 
     def get_playcount(self):
@@ -99,6 +117,7 @@ class Node(Base):
         )
 
         self.rating, self.num_ratings = result.fetchone()
+            
         session.commit()
 
     def get_rating(self):
