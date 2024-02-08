@@ -1,6 +1,7 @@
 from user import User
 from uuid import uuid4
 import os
+from werkzeug.datastructures import FileStorage
 
 from db_manager import Base
 from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_, DateTime
@@ -41,9 +42,9 @@ class Node(Base):
 
     user = relationship('User')
 
-    def __init__(self, session: Session, user: User, description: str="", lvl_buf: bytes=b''):
+    def __init__(self, session: Session, user: User, description: str, lvl_buf: FileStorage):
         # attributes that will change over time
-        self.user = user 
+        self.user_id = user.username
         self.playcount = 0
         self.num_ratings = 0
         self.rating = 0                
@@ -54,10 +55,8 @@ class Node(Base):
 
     def _write_file(self, lvl_buf: bytes):
         # create level file based on some variable passed here (will do tests later w/ api)
-        f = open(self.get_file_path(), 'wb')
-        f.write(lvl_buf)
-        f.close()
-
+        lvl_buf.save(self.get_file_path())
+        
     def get_file_path(self):
         # get project root
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +65,7 @@ class Node(Base):
         return root + "/levels/" + self.id + ".level"
 
     def __repr__(self):
-        return f"Node({self.id},, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description}, {self.ts})"
+        return f"Node({self.id}, {self.user_id}, {self.playcount}, {self.num_ratings}, {self.rating}, {self.description}, {self.ts})"
 
     def save(self, session: Session):
         session.add(self) # add node to session

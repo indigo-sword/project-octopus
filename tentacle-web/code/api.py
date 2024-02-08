@@ -1,5 +1,5 @@
 from flask import Flask, request
-from api_func_user import *
+from api_func import *
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectOctopusCertainlyIsNotThatSecret"
@@ -22,7 +22,16 @@ def create_user():
     if not("email" in request.form):
         return {"message": "no email parameter"}, 404
     
-    return create_user_func(request.form["username"], request.form["password"], request.form["email"])
+    bio = "" if not("bio" in request.form) else request.form["bio"]
+    
+    return create_user_func(request.form["username"], request.form["password"], request.form["email"], bio)
+
+@app.route("/get_user", methods=["GET"])
+def get_user():
+    if not("username" in request.form):
+        return {"message": "no username parameter"}, 404
+    
+    return get_user_func(request.form["username"])
 
 @app.route("/change_user_bio", methods=["POST"])
 def change_user_bio():
@@ -121,6 +130,30 @@ def get_friends():
         return {"message": "no username parameter"}, 404
     
     return get_friends_func(request.form["username"])
+
+@app.route("/create_node", methods=["POST"])
+def create_node():
+    if not("username" in request.form):
+        return {"message": "no username parameter"}, 404
+    
+    if not("description" in request.form):
+        return {"message": "no description parameter"}, 404
+    
+    # needs to have also sent a file, check that
+    if "file" not in request.files:
+        return {"message": "no file parameter"}, 404
+    
+    file_buf = request.files["file"]
+    file_buf.seek(0, 2)
+
+    if not file_buf or file_buf.tell() == 0:
+        return {"message": "no file data"}, 404
+    
+    file_buf.seek(0)
+
+    return create_node_func(request.form["username"], request.form["description"], file_buf)
+
+
 
 if __name__ == "__main__":
     app.run(host='localhost', port=7809)

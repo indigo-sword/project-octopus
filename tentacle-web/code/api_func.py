@@ -1,9 +1,11 @@
 from db_manager import db_session
 from user import User
+from node import Node
 import bcrypt
 import re
+from werkzeug.datastructures import FileStorage
 
-def create_user_func(username: str, password: str, email: str):
+def create_user_func(username: str, password: str, email: str, bio: str):
     ''' create user '''
     # perform email regex check
     if not re.match(r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$', email):
@@ -21,7 +23,7 @@ def create_user_func(username: str, password: str, email: str):
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     # create user
-    User(db_session, username, password, email)
+    User(db_session, username, password, email, bio)
 
     return {"message": "User created"}, 201
 
@@ -65,6 +67,13 @@ def get_follows_func(username: str):
     if not u: return {"message": "User not found"}, 404
     
     return {"message": "user following and followed", "following": u.get_following(db_session), "followed": u.get_followers(db_session)}, 200
+
+def get_user_func(username: str):
+    ''' get user '''
+    u = db_session.query(User).filter(User.username == username).first()
+    if not u: return {"message": "User not found"}, 404
+    
+    return {"message": "user info", "username": u.username, "bio": u.bio, "email": u.email, "following": u.following, "followers": u.followers}, 200
 
 def add_friend_func(username: str, friend_username: str):
     ''' add friend '''
@@ -136,3 +145,13 @@ def get_friends_func(username: str):
     
     return {"message": "user friends", "friends": u.get_friends(db_session), "requests": u.get_friend_requests(db_session), "sent requests": u.get_friend_requests_sent(db_session)}, 200
 
+def create_node_func(username: str, description: str, file_buf: FileStorage):
+    ''' create node '''
+    u = db_session.query(User).filter(User.username == username).first()
+    if not u: return {"message": "User not found"}, 404
+
+    # create node
+    n = Node(db_session, u, description, file_buf)
+
+    return {"message": "Node created", "node_id": n.id}, 201
+    

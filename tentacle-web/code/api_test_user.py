@@ -5,6 +5,7 @@ import string
 url = f'http://localhost:7809/'
 
 import unittest
+import os
 
 def random_email():
     return ''.join(random.choice(string.ascii_letters) for _ in range(10)) + "@gmail.com"
@@ -916,7 +917,41 @@ class TestApiUser(unittest.TestCase):
             self.assertEqual(response.status_code, 404)
             self.assertEqual(response.json()["message"], "no username parameter")
 
+    def test_get_user(self):
+        with self.subTest(msg="get user"):
+            u = random_username()
+            e = random_email()
+            requests.post(url + "create_user", data={
+                "username": u,
+                "password": "password_4_joao",
+                "email": e,
+                "bio": "I am Joao"
+            })
 
+            response = requests.get(url + "get_user", data={
+                "username": u
+            })
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()["username"], u)
+            self.assertEqual(response.json()["email"], e)
+            self.assertEqual(response.json()["bio"], "I am Joao")
+            self.assertEqual(response.json()["following"], 0)
+            self.assertEqual(response.json()["followers"], 0)
+
+        with self.subTest(msg="user not found"):
+            response = requests.get(url + "get_user", data={
+                "username": "this username does not exist"
+            })
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json()["message"], "User not found")
+
+        with self.subTest(msg="no username parameter"):
+            response = requests.get(url + "get_user")
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json()["message"], "no username parameter")
 def main():
     unittest.main()
 
