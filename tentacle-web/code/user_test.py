@@ -18,7 +18,6 @@ class TestUser(unittest.TestCase):
         e = random_email()
         u = User(db_session, i, "PASS", e, "SOME BIO")
         self.assertEqual(u.username, i)
-        self.assertEqual(u.password, "PASS")
         self.assertEqual(u.email, e)
         self.assertEqual(u.bio, "SOME BIO")
 

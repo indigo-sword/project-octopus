@@ -4,7 +4,7 @@ import os
 from werkzeug.datastructures import FileStorage
 
 from db_manager import Base
-from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_, DateTime
+from sqlalchemy import Column, Integer, String, Double, ForeignKey, update, or_, DateTime, and_, Boolean
 from sqlalchemy.orm import relationship, Session
 from datetime import datetime
 
@@ -30,6 +30,9 @@ class NodeLink(Base):
         session.add(self)
         session.commit()
 
+    def __repr__(self):
+        return f"NodeLink({self.origin_id}, {self.destination_id}, {self.description}, {self.ts})"
+
 class Node(Base):
     __tablename__ = 'nodes'
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
@@ -38,11 +41,14 @@ class Node(Base):
     num_ratings = Column(Integer)
     rating = Column(Double)
     description = Column(String)
+    is_initial = Column(Boolean, default=False)
     ts = Column(DateTime, default=datetime.utcnow)
+
+    # TODO: need to check for node being initial (so it cannot be linked to)
 
     user = relationship('User')
 
-    def __init__(self, session: Session, user: User, description: str, lvl_buf: FileStorage):
+    def __init__(self, session: Session, user: User, description: str, lvl_buf: FileStorage, is_initial: bool = False):
         # attributes that will change over time
         self.user_id = user.username
         self.playcount = 0
@@ -50,13 +56,14 @@ class Node(Base):
         self.rating = 0                
         self.description = description
 
+        self.is_initial = is_initial
+
         self.save(session)
         self._write_file(lvl_buf)
 
-    def _write_file(self, lvl_buf: bytes):
-        # create level file based on some variable passed here (will do tests later w/ api)
+    def _write_file(self, lvl_buf: FileStorage):
         lvl_buf.save(self.get_file_path())
-        
+
     def get_file_path(self):
         # get project root
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,20 +81,31 @@ class Node(Base):
     def link(self, node: 'Node', description: str, session: Session):
         ''' link self to a next node '''
         if node == self:
-            raise Exception("Cannot link node to itself")
+            raise Exception("cannot link node to itself")
+        
+        if node.is_initial:
+            raise Exception("cannot link to initial node")
         
         # check if destination already has a link to self
         result = session.query(NodeLink).filter(
             or_(
-                (NodeLink.destination_id == self.id and NodeLink.origin_id == node.id),
-                (NodeLink.destination_id == node.id and NodeLink.origin_id == self.id)
+                and_(NodeLink.destination_id == self.id, NodeLink.origin_id == node.id),
+                and_(NodeLink.destination_id == node.id, NodeLink.origin_id == self.id)
             )
         ).all()
         
         if result:
-            raise Exception("Nodes are already linked.")
+            raise Exception("nodes are already linked.")
         
         link = NodeLink(session, origin=self, destination=node, description=description)
+
+    def get_next_links(self, session: Session):
+        ''' get next links '''
+        return session.query(NodeLink).filter(NodeLink.origin_id == self.id).all()
+    
+    def get_previous_links(self, session: Session):
+        ''' get previous links '''
+        return session.query(NodeLink).filter(NodeLink.destination_id == self.id).all()
 
     def update_playcount(self, session: Session):
         result = session.execute(
@@ -103,10 +121,22 @@ class Node(Base):
 
     def get_playcount(self):
         return self.playcount
+
+    def update_description(self, description: str, session: Session):
+        result = session.execute(
+            update(Node)
+            .where(Node.id == self.id)
+            .values(description=description)
+            .returning(Node.description)
+        )
+        
+        self.description = result.scalar()
+            
+        session.commit()
     
-    def update_rating(self, rating: int, session: Session):
+    def update_rating(self, rating: float, session: Session):
         if rating < 0 or rating > 10:
-            raise Exception("Rating must be between 0 and 10")
+            raise Exception("rating must be between 0 and 10")
         
         result = session.execute(
             update(Node)
