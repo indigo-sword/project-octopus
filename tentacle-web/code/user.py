@@ -1,13 +1,14 @@
-from sqlalchemy import Column, String, ForeignKey, Integer, or_, DateTime, update
+from sqlalchemy import Column, String, ForeignKey, Integer, or_, DateTime, update, LargeBinary
 from sqlalchemy.orm import Session, relationship
 from db_manager import Base
 from uuid import uuid4
 from datetime import datetime
+import bcrypt
 
 class User(Base):
     __tablename__ = 'users'
     username = Column(String, unique=True, primary_key=True, index=True)
-    password = Column(String)
+    password = Column(LargeBinary)
     email = Column(String, unique=True)
     bio = Column(String)
     ts = Column(DateTime, default=datetime.utcnow)
@@ -16,7 +17,7 @@ class User(Base):
 
     def __init__(self, session: Session, username: str, password: str, email: str, bio: str=""):
         self.username = username
-        self.password = password
+        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.email = email
         self.bio = bio
         self.following = 0
@@ -123,7 +124,9 @@ class User(Base):
 
     def remove_friend(self, session: Session, friend: 'User'):
         ''' removes friend '''
-        f = session.query(Friendship).filter(Friendship.friend_one == self.username).filter(Friendship.friend_two == friend.username).first()
+        # get friendship where either self is friend_one and friend is friend_two or vice versa
+        f = session.query(Friendship).filter(or_(Friendship.friend_one == self.username, Friendship.friend_two == self.username)).filter(or_(Friendship.friend_one == friend.username, Friendship.friend_two == friend.username)).first()
+
         if not f: raise Exception("User is not a friend")
         f.reject(session)
         
