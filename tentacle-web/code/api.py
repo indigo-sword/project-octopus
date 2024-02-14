@@ -131,13 +131,6 @@ def create_node():
     is_initial = False if not("is_initial" in request.form) else request.form["is_initial"] == "true"
     return create_node_func(request.form["username"], request.form["description"], file_buf, is_initial)
 
-@app.route("/change_node_description", methods=["POST"])
-@login_required
-@attribute_required("node_id")
-@attribute_required("description")
-def change_node_description():    
-    return change_node_description_func(request.form["username"], request.form["node_id"], request.form["description"])
-
 @app.route("/get_node", methods=["GET"])
 @attribute_required("node_id")
 def get_node():    

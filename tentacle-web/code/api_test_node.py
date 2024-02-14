@@ -229,151 +229,6 @@ class TestApiNode(unittest.TestCase):
             self.assertEqual(response.status_code, 401)
             self.assertEqual(response.json()["message"], "user not logged in")
 
-    def test_change_node_description(self):
-        with self.subTest("change node description"):
-            session = requests.Session()
-
-            u = random_username()
-            session.post(url + "create_user", data={
-                "username": u,
-                "password": "password_4_joao",
-                "email": random_email()
-            })
-
-            session.post(url + "login", data={
-                "username": u,
-                "password": "password_4_joao"
-            })
-
-            with open("files/test.txt", "wb") as f:
-                f.write(b"THIS TEST HAS PASSED! 11")
-            
-            with open("files/test.txt", "rb") as f:
-                response = session.post(url + "create_node", data={
-                    "username": u,
-                    "description": "some description",
-                }, files={"file": f})
-                nid = response.json()["node_id"]
-
-            os.remove("files/test.txt")
-
-            response = session.post(url + "change_node_description", data={
-                "username": u,
-                "node_id": nid,
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json()["message"], "node updated")
-
-        with self.subTest("change node description no username"):
-            response = session.post(url + "change_node_description", data={
-                "node_id": nid,
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.json()["message"], "no username parameter")
-
-        with self.subTest("change node description no node_id"):
-            response = session.post(url + "change_node_description", data={
-                "username": u,
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.json()["message"], "no node_id parameter")
-
-        with self.subTest("change node description no description"):
-            response = session.post(url + "change_node_description", data={
-                "username": u,
-                "node_id": nid,
-            })
-        
-            self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.json()["message"], "no description parameter")
-
-        with self.subTest("change node description no node"):
-            response = session.post(url + "change_node_description", data={
-                "username": u,
-                "node_id": "nonexistentnode",
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.json()["message"], "node not found")
-
-        with self.subTest("change node description wrong user"):
-            response = session.post(url + "change_node_description", data={
-                "username": "nonexistentuser",
-                "node_id": nid,
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 401)
-            self.assertEqual(response.json()["message"], "wrong user for request")
-
-        with self.subTest("change node description user does not own node"):
-            sessionOne = requests.Session()
-            sessionTwo = requests.Session()
-
-            uOne = random_username()
-            uTwo = random_username()
-
-            sessionOne.post(url + "create_user", data={
-                "username": uOne,
-                "password": "password_4_joao",
-                "email": random_email()
-            })
-
-            sessionTwo.post(url + "create_user", data={
-                "username": uTwo,
-                "password": "password_4_joao",
-                "email": random_email()
-            })
-
-            sessionOne.post(url + "login", data={
-                "username": uOne,
-                "password": "password_4_joao"
-            })
-
-            sessionTwo.post(url + "login", data={
-                "username": uTwo,
-                "password": "password_4_joao"
-            })
-
-            with open("files/test.txt", "wb") as f:
-                f.write(b"THIS TEST HAS PASSED! 11")
-
-            with open("files/test.txt", "rb") as f:
-                response = sessionOne.post(url + "create_node", data={
-                    "username": uOne,
-                    "description": "some description",
-                }, files={"file": f})
-                nid = response.json()["node_id"]
-
-            os.remove("files/test.txt")
-
-            response = sessionTwo.post(url + "change_node_description", data={
-                "username": uTwo,
-                "node_id": nid,
-                "description": "new description"
-            })
-
-            self.assertEqual(response.status_code, 401)
-            self.assertEqual(response.json()["message"], "user does not own this node")
-
-        with self.subTest("change node description user not logged in"):
-            session = requests.Session()
-            response = session.post(url + "change_node_description", data={
-                "username": u,
-                "node_id": nid,
-                "description": "new description"
-            })
-        
-            self.assertEqual(response.status_code, 401)
-            self.assertEqual(response.json()["message"], "user not logged in")
-
     def test_get_node(self):
         # create a node
         session = requests.Session()
@@ -431,9 +286,11 @@ class TestApiNode(unittest.TestCase):
     def test_link_nodes(self):
         sessionOne = requests.Session()
         sessionTwo = requests.Session()
+        sessionThree = requests.Session()
 
         uOne = random_username()
         uTwo = random_username()
+        uThree = random_username()
 
         sessionOne.post(url + "create_user", data={
             "username": uOne,
@@ -447,6 +304,12 @@ class TestApiNode(unittest.TestCase):
             "email": random_email()
         })
 
+        sessionThree.post(url + "create_user", data={
+            "username": uThree,
+            "password": "password_4_joao",
+            "email": random_email()
+        })
+
         sessionOne.post(url + "login", data={
             "username": uOne,
             "password": "password_4_joao"
@@ -454,6 +317,11 @@ class TestApiNode(unittest.TestCase):
 
         sessionTwo.post(url + "login", data={
             "username": uTwo,
+            "password": "password_4_joao"
+        })
+
+        sessionThree.post(url + "login", data={
+            "username": uThree,
             "password": "password_4_joao"
         })
 
@@ -562,15 +430,15 @@ class TestApiNode(unittest.TestCase):
             self.assertEqual(response.json()["message"], "nodes are already linked.")
 
         with self.subTest("link nodes user does not own origin node"):
-            response = sessionTwo.post(url + "link_nodes", data={
-                "username": uTwo,
+            response = sessionThree.post(url + "link_nodes", data={
+                "username": uThree,
                 "origin_id": nidOne,
                 "destination_id": nidTwo,
                 "description": "some description"
             })
 
             self.assertEqual(response.status_code, 401)
-            self.assertEqual(response.json()["message"], "user does not own the origin node")
+            self.assertEqual(response.json()["message"], "user does not own any of the nodes")
 
         with self.subTest("link nodes node link to itself"):
             response = sessionOne.post(url + "link_nodes", data={

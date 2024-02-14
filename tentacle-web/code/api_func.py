@@ -163,19 +163,6 @@ def create_node_func(username: str, description: str, file_buf: FileStorage, is_
 
     return {"message": "node created", "node_id": n.id}, 201
 
-def change_node_description_func(username: str, node_id: str, description: str):
-    ''' update node '''
-    u = db_session.query(User).filter(User.username == username).first()
-    if not u: return {"message": "user not found"}, 404
-
-    n = db_session.query(Node).filter(Node.id == node_id).first()
-    if not n: return {"message": "node not found"}, 404
-
-    if n.user_id != u.username: return {"message": "user does not own this node"}, 401
-
-    n.update_description(description, db_session)
-    return {"message": "node updated"}, 200
-
 def get_node_func(node_id: str):
     ''' get node '''
     n = db_session.query(Node).filter(Node.id == node_id).first()
@@ -194,7 +181,7 @@ def link_nodes_func(username: str, origin_id: str, destination_id: str, descript
     d = db_session.query(Node).filter(Node.id == destination_id).first()
     if not d: return {"message": "destination node not found"}, 404
 
-    if o.user_id != u.username: return {"message": "user does not own the origin node"}, 401
+    if u.username not in [o.user_id, d.user_id]: return {"message": "user does not own any of the nodes"}, 401
 
     try: o.link(d, description, db_session)
     except Exception as e: return {"message": str(e)}, 400
