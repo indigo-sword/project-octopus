@@ -114,8 +114,33 @@ class TestNode(unittest.TestCase):
 
         os.remove("files/test.txt")
 
-        with self.assertRaises(Exception):
-            testNodeOne.link(testNodeTwo, "some description", db_session)
+        try: testNodeOne.link(testNodeTwo, "some description", db_session)
+        except Exception as e: self.assertEqual(str(e), "cannot link to initial node")
+
+    def test_link_fail_self(self):
+        u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
+        with open("files/test.txt", "wb") as f:
+            f.write(b"THIS TEST HAS PASSED! 11")
+            f.seek(0)
+
+        with open("files/test.txt", "rb") as f:
+            storage = FileStorage(f, filename='test.txt')
+            testNodeOne = Node(db_session, u, "DESC", storage, is_final=True)
+
+        os.remove("files/test.txt")
+
+        with open("files/test.txt", "wb") as f:
+            f.write(b"THIS TEST HAS PASSED! 11")
+            f.seek(0)
+
+        with open("files/test.txt", "rb") as f:
+            storage = FileStorage(f, filename='test.txt')
+            testNodeTwo = Node(db_session, u, "DESC", storage)
+
+        os.remove("files/test.txt")
+
+        try: testNodeOne.link(testNodeTwo, "some description", db_session)
+        except Exception as e: self.assertEqual(str(e), "cannot link from final node")
 
     def test_update_playcount(self):
         u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")

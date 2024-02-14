@@ -6,6 +6,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectOctopusCertainlyIsNotThatSecret"
 app.secret_key = "projectOctopusCertainlyIsNotThatSecret"
 
+########### User API ###########
 def login_required(func):
     @wraps(func)
     @attribute_required("username")
@@ -112,6 +113,7 @@ def remove_friend():
 def get_friends():   
     return get_friends_func(request.form["username"])
 
+########### Node API ###########
 @app.route("/create_node", methods=["POST"])
 @login_required
 @attribute_required("description")
@@ -129,7 +131,8 @@ def create_node():
     file_buf.seek(0)
     
     is_initial = False if not("is_initial" in request.form) else request.form["is_initial"] == "true"
-    return create_node_func(request.form["username"], request.form["description"], file_buf, is_initial)
+    is_final = False if not("is_final" in request.form) else request.form["is_final"] == "true"
+    return create_node_func(request.form["username"], request.form["description"], file_buf, is_initial, is_final)
 
 @app.route("/get_node", methods=["GET"])
 @attribute_required("node_id")
@@ -178,6 +181,8 @@ def update_rating():
 @attribute_required("description")
 def update_node_description():    
     return update_node_description_func(request.form["username"], request.form["node_id"], request.form["description"])
+
+########### Path API ###########
 
 if __name__ == "__main__":
     app.run(host='localhost', port=7809)

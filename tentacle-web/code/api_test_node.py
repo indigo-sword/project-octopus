@@ -429,7 +429,7 @@ class TestApiNode(unittest.TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json()["message"], "nodes are already linked.")
 
-        with self.subTest("link nodes user does not own origin node"):
+        with self.subTest("link nodes user does not own any node"):
             response = sessionThree.post(url + "link_nodes", data={
                 "username": uThree,
                 "origin_id": nidOne,
@@ -462,6 +462,15 @@ class TestApiNode(unittest.TestCase):
             }, files={"file": f})
             nidThree = response.json()["node_id"]
 
+            f.seek(0)
+
+            response = sessionTwo.post(url + "create_node", data={
+                "username": uTwo,
+                "description": "some description",
+                "is_final": "true",
+            }, files={"file": f})
+            nidFour = response.json()["node_id"]
+
         with self.subTest("link nodes to initial node"):
             response = sessionOne.post(url + "link_nodes", data={
                 "username": uOne,
@@ -472,6 +481,18 @@ class TestApiNode(unittest.TestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json()["message"], "cannot link to initial node")
+
+        with self.subTest("link nodes from final node"):
+            response = sessionTwo.post(url + "link_nodes", data={
+                "username": uTwo,
+                "origin_id": nidFour,
+                "destination_id": nidTwo,
+                "description": "some description"
+            })
+
+            self.assertEqual(response.status_code, 400)
+
+            self.assertEqual(response.json()["message"], "cannot link from final node")
 
         with self.subTest("link nodes user not logged in"):
             session = requests.Session()

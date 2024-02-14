@@ -153,13 +153,13 @@ def get_friends_func(username: str):
     
     return {"message": "user friends", "friends": u.get_friends(db_session), "requests": u.get_friend_requests(db_session), "sent requests": u.get_friend_requests_sent(db_session)}, 200
 
-def create_node_func(username: str, description: str, file_buf: FileStorage, is_initial: bool = False):
+def create_node_func(username: str, description: str, file_buf: FileStorage, is_initial: bool = False, is_final: bool = False):
     ''' create node '''
     u = db_session.query(User).filter(User.username == username).first()
     if not u: return {"message": "user not found"}, 404
 
     # create node
-    n = Node(db_session, u, description, file_buf, is_initial)
+    n = Node(db_session, u, description, file_buf, is_initial, is_final)
 
     return {"message": "node created", "node_id": n.id}, 201
 

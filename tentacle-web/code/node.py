@@ -42,13 +42,11 @@ class Node(Base):
     rating = Column(Double)
     description = Column(String)
     is_initial = Column(Boolean, default=False)
+    is_final = Column(Boolean, default=False)
     ts = Column(DateTime, default=datetime.utcnow)
-
-    # TODO: need to check for node being initial (so it cannot be linked to)
-
     user = relationship('User')
 
-    def __init__(self, session: Session, user: User, description: str, lvl_buf: FileStorage, is_initial: bool = False):
+    def __init__(self, session: Session, user: User, description: str, lvl_buf: FileStorage, is_initial: bool = False, is_final: bool = False):
         # attributes that will change over time
         self.user_id = user.username
         self.playcount = 0
@@ -57,6 +55,7 @@ class Node(Base):
         self.description = description
 
         self.is_initial = is_initial
+        self.is_final = is_final
 
         self.save(session)
         self._write_file(lvl_buf)
@@ -85,6 +84,9 @@ class Node(Base):
         
         if node.is_initial:
             raise Exception("cannot link to initial node")
+        
+        if self.is_final:
+            raise Exception("cannot link from final node")
         
         # check if destination already has a link to self
         result = session.query(NodeLink).filter(
