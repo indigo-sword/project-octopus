@@ -137,7 +137,6 @@ def get_friends():
 
 
 ########### Node API ###########
-# TODO: add title update, add test for attr required title, test title update
 @app.route("/create_node", methods=["POST"])
 @login_required
 @attribute_required("description")
@@ -237,7 +236,11 @@ def update_node_description():
     )
 
 
+# TODO: add title update, add test for attr required title, test title update
+# TODO: implement update LEVEL
+
 ########### Path API ###########
+
 
 if __name__ == "__main__":
     app.run(host="localhost", port=7809)
