@@ -502,7 +502,7 @@ class TestApiNode(unittest.TestCase):
                 "destination_id": nidTwo,
                 "description": "some description"
             })
-
+ 
             self.assertEqual(response.status_code, 401)
             self.assertEqual(response.json()["message"], "user not logged in")
 

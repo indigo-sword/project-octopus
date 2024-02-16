@@ -1488,7 +1488,7 @@ class TestApiUser(unittest.TestCase):
                 "username": random_username(),
                 "friend_username": f
             })
-
+ 
             self.assertEqual(response.status_code, 401)
             self.assertEqual(response.json()["message"], "wrong user for request")
         

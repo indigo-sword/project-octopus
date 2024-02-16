@@ -7,21 +7,26 @@ from uuid import uuid4
 import random
 import string
 
+
 def random_email():
-    return ''.join(random.choice(string.ascii_letters) for _ in range(10)) + "@gmail.com"
+    return (
+        "".join(random.choice(string.ascii_letters) for _ in range(10)) + "@gmail.com"
+    )
+
 
 u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
+
 
 class TestPath(unittest.TestCase):
     def test_create_path(self):
         p = Path(db_session, u, "DESCRIPTION")
         self.assertEqual(p.user_id, u.username)
-        
+
         p2 = db_session.query(Path).filter(Path.id == p.id).first()
         self.assertEqual(p2.id, p.id)
 
     def test_add_node(self):
-        n = Node(db_session, u, "test", b'LEVEL')
+        n = Node(db_session, u, "test", b"LEVEL")
 
         p = Path(db_session, u, "DESCRIPTION")
         p.add_node(n, db_session)
@@ -36,7 +41,7 @@ class TestPath(unittest.TestCase):
             p.add_node(n, db_session)
 
     def test_add_node_to_two_diff_paths(self):
-        n = Node(db_session, u, "test", b'LEVEL')
+        n = Node(db_session, u, "test", b"LEVEL")
 
         p = Path(db_session, u, "DESCRIPTION")
         p.add_node(n, db_session)
@@ -81,6 +86,7 @@ class TestPath(unittest.TestCase):
 
 def main():
     unittest.main()
+
 
 if __name__ == "__main__":
     main()
