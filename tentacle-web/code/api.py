@@ -277,7 +277,8 @@ def update_node_title():
 
 
 ########### Path API ###########
-
+# add to path, create path from lots of node_ids, get path, get next node, get previous node, update playcount, update rating
+# what else: get all paths, get all paths for user, get all paths for node, get all paths for node and user
 
 if __name__ == "__main__":
     app.run(host="localhost", port=7809)
