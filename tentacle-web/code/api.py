@@ -174,6 +174,36 @@ def create_node():
     )
 
 
+# TODO: test test get LEVEL
+@app.route("/get_level", methods=["GET"])
+@attribute_required("node_id")
+def get_level():
+    return get_level_func(request.form["node_id"])
+
+
+@app.route("/update_node_level", methods=["POST"])
+@login_required
+@attribute_required("node_id")
+def update_node_level():
+    # needs to have also sent a file
+    if "file" not in request.files:
+        return {"message": "no file parameter"}, 404
+
+    file_buf = request.files["file"]
+    file_buf.seek(0, 2)
+
+    if not file_buf or file_buf.tell() == 0:
+        return {"message": "no file data"}, 404
+
+    file_buf.seek(0)
+
+    return update_node_level_func(
+        request.form["username"],
+        request.form["node_id"],
+        file_buf,
+    )
+
+
 @app.route("/get_node", methods=["GET"])
 @attribute_required("node_id")
 def get_node():
@@ -236,8 +266,15 @@ def update_node_description():
     )
 
 
-# TODO: add title update, add test for attr required title, test title update
-# TODO: implement update LEVEL
+@app.route("/update_node_title", methods=["POST"])
+@login_required
+@attribute_required("node_id")
+@attribute_required("title")
+def update_node_title():
+    return update_node_title_func(
+        request.form["username"], request.form["node_id"], request.form["title"]
+    )
+
 
 ########### Path API ###########
 

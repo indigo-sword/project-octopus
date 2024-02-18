@@ -56,6 +56,7 @@ class Node(Base):
     __tablename__ = "nodes"
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
     user_id = Column(Integer, ForeignKey("users.username"))
+    title = Column(String)
     playcount = Column(Integer)
     num_ratings = Column(Integer)
     rating = Column(Double)
@@ -87,6 +88,13 @@ class Node(Base):
         self.is_final = is_final
 
         self.save(session)
+        self._write_file(lvl_buf)
+
+    def update_level(self, lvl_buf: FileStorage):
+        # clear the content inside get_file_path()
+        with open(self.get_file_path(), "w") as f:
+            f.truncate(0)
+
         self._write_file(lvl_buf)
 
     def _write_file(self, lvl_buf: FileStorage):

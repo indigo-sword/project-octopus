@@ -4,6 +4,8 @@ from node import Node
 import bcrypt
 import re
 from werkzeug.datastructures import FileStorage
+from flask import send_file
+import os
 
 
 def login_user_func(username: str, password: str):
@@ -221,7 +223,10 @@ def create_node_func(
         return {"message": "user not found"}, 404
 
     # create node
-    n = Node(db_session, u, title, description, file_buf, is_initial, is_final)
+    try:
+        n = Node(db_session, u, title, description, file_buf, is_initial, is_final)
+    except Exception:
+        return {"message": "node creation failed. try again."}, 400
 
     return {"message": "node created", "node_id": n.id}, 201
 
@@ -240,6 +245,7 @@ def get_node_func(node_id: str):
         "rating": n.rating,
         "description": n.description,
         "ts": n.ts,
+        "title": n.title,
     }, 200
 
 
@@ -334,3 +340,43 @@ def update_node_description_func(username: str, node_id: str, description: str):
 
     n.update_description(description, db_session)
     return {"message": "description updated", "description": n.description}, 200
+
+
+def update_node_title_func(username: str, node_id: str, title: str):
+    """update title"""
+    n = db_session.query(Node).filter(Node.id == node_id).first()
+    if not n:
+        return {"message": "node not found"}, 404
+
+    if n.user_id != username:
+        return {"message": "user does not own this node"}, 401
+
+    n.update_title(title, db_session)
+    return {"message": "title updated"}, 200
+
+
+def update_node_level_func(username: str, node_id: str, level: int):
+    """update level"""
+    n = db_session.query(Node).filter(Node.id == node_id).first()
+    if not n:
+        return {"message": "node not found"}, 404
+
+    if n.user_id != username:
+        return {"message": "user does not own this node"}, 401
+
+    n.update_level(level)
+    return {"message": "level updated"}, 200
+
+
+def get_level_func(node_id: str):
+    """get level"""
+    n = db_session.query(Node).filter(Node.id == node_id).first()
+    if not n:
+        return {"message": "node not found"}, 404
+
+    # return a file which is in n.get_file_path()
+    path = n.get_file_path()
+    if not os.path.exists(path):
+        return {"message": "level not found"}, 404
+
+    return send_file(path, as_attachment=True)

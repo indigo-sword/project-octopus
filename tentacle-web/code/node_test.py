@@ -307,7 +307,25 @@ class TestNode(unittest.TestCase):
             n3.id in [n.origin_id for n in n4.get_previous_links(db_session)]
         )
 
-    # TODO: test title update
+    def test_update_title(self):
+        u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
+
+        with open("files/test.txt", "wb") as f:
+            f.write(b"THIS TEST HAS PASSED! 11")
+            f.seek(0)
+
+        with open("files/test.txt", "rb") as f:
+            storage = FileStorage(f, filename="test.txt")
+            n = Node(db_session, u, "TITLE1", "DESC1", storage)
+            f.seek(0)
+
+        n.update_title("NEW TITLE", db_session)
+        self.assertEqual(n.title, "NEW TITLE")
+
+        title = db_session.query(Node).filter(Node.id == n.id).first().title
+        self.assertEqual(title, "NEW TITLE")
+
+        os.remove("files/test.txt")
 
 
 class TestNodeLink(unittest.TestCase):
@@ -339,6 +357,38 @@ class TestNodeLink(unittest.TestCase):
 
         l2 = db_session.query(NodeLink).filter(NodeLink.id == l.id).first()
         self.assertEqual(l2.id, l.id)
+
+    def test_update_level(self):
+        u = User(db_session, str(uuid4()), "PASS", random_email(), "BIO")
+
+        with open("files/test.txt", "wb") as f:
+            f.write(b"THIS TEST HAS PASSED! 11")
+            f.seek(0)
+
+        with open("files/test.txt", "rb") as f:
+            storage = FileStorage(f, filename="test.txt")
+            n = Node(db_session, u, "TITLE", "DESC", storage)
+
+        os.remove("files/test.txt")
+
+        with open("files/test.txt", "wb") as f:
+            f.write(b"NOW THE CONTENT OF THIS FILE HAS CHANGED")
+            f.seek(0)
+
+        with open("files/test.txt", "rb") as f:
+            n.update_level(FileStorage(f, filename="test.txt"))
+
+        self.assertEqual(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            + "/levels/"
+            + n.id
+            + ".level",
+            n.get_file_path(),
+        )
+
+        with open(n.get_file_path(), "r") as f:
+            self.assertEqual(f.read(), "NOW THE CONTENT OF THIS FILE HAS CHANGED")
+            f.close()
 
 
 def main():
