@@ -20,18 +20,21 @@ from datetime import datetime
 class Path(Base):
     __tablename__ = "paths"
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    user_id = Column(Integer, ForeignKey("users.username"))
+    user_id = Column(String, ForeignKey("users.username"))
     description = Column(String)
     ts = Column(DateTime, default=datetime.utcnow)
 
     playcount = Column(Integer)
     num_ratings = Column(Integer)
     rating = Column(Double)
+    position = Column(Integer)
+    title = Column(String)
 
     user = relationship("User")
 
-    def __init__(self, session: Session, user: User, description: str = ""):
+    def __init__(self, session: Session, user: User, title: str, description: str):
         self.user = user
+        self.title = title
         self.description = description
         self.position = 0
 
@@ -45,7 +48,39 @@ class Path(Base):
         session.add(self)
         session.commit()
 
-    def add_node(self, node: Node, session: Session):
+    def delete(self, session: Session):
+        session.delete(self)
+        # remove all mentions to path p in db
+        session.execute(
+            path_node_association.delete().where(
+                path_node_association.c.path_id == self.id
+            )
+        )
+
+        session.commit()
+
+    def add_node(self, node: Node, position: int, session: Session):
+        # check for valid position
+        if position < 0:
+            raise Exception("invalid position - negative")
+
+        # check for path having any nodes already
+        if position == 0:
+            q = (
+                session.query(path_node_association)
+                .filter(path_node_association.c.path_id == self.id)
+                .filter(path_node_association.c.position == 0)
+                .first()
+            )
+
+            if q is not None:
+                raise Exception(
+                    "invalid position - path already has node in position zero"
+                )
+
+        if position > self.position + 1:
+            raise Exception("invalid position - no way to link")
+
         # check for node in path
         q = (
             session.query(path_node_association)
@@ -54,15 +89,17 @@ class Path(Base):
             .first()
         )
         if q is not None:
-            raise Exception("Node already in path")
+            raise Exception("node already in path")
+
+        # increase position in case we add a next node
+        if position == self.position + 1:
+            self.position += 1
 
         session.execute(
             path_node_association.insert().values(
-                path_id=self.id, node_id=node.id, position=self.position
+                path_id=self.id, node_id=node.id, position=position
             )
         )
-
-        self.position += 1
 
         session.commit()
 
@@ -89,12 +126,9 @@ class Path(Base):
 
         session.commit()
 
-    def get_playcount(self):
-        return self.playcount
-
     def update_rating(self, rating: int, session: Session):
         if rating < 0 or rating > 10:
-            raise Exception("Rating must be between 0 and 10")
+            raise Exception("rating must be between 0 and 10")
 
         result = session.execute(
             update(Path)
@@ -113,6 +147,30 @@ class Path(Base):
 
     def get_rating(self):
         return round(self.rating, 2)
+
+    def update_title(self, title: str, session: Session):
+        session.execute(
+            update(Path)
+            .where(Path.id == self.id)
+            .values(title=title)
+            .returning(Path.title)
+        )
+
+        self.title = title
+
+        session.commit()
+
+    def update_description(self, description: str, session: Session):
+        session.execute(
+            update(Path)
+            .where(Path.id == self.id)
+            .values(description=description)
+            .returning(Path.description)
+        )
+
+        self.description = description
+
+        session.commit()
 
 
 path_node_association = Table(

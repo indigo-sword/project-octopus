@@ -277,6 +277,111 @@ def update_node_title():
 
 
 ########### Path API ###########
+@app.route("/create_path", methods=["POST"])
+@login_required
+@attribute_required("title")
+@attribute_required("description")
+def create_path():
+    return create_path_func(
+        request.form["username"], request.form["title"], request.form["description"]
+    )
+
+
+@app.route("/add_to_path", methods=["POST"])
+@login_required
+@attribute_required("path_id")
+@attribute_required("node_id")
+@attribute_required("position")
+def add_to_path():
+    # parse int for position
+    try:
+        position = int(request.form["position"])
+    except ValueError:
+        return {"message": "position is not a number"}, 404
+
+    return add_to_path_func(
+        request.form["username"],
+        request.form["path_id"],
+        request.form["node_id"],
+        position,
+    )
+
+
+@app.route("/get_path", methods=["GET"])
+@attribute_required("path_id")
+def get_path():
+    return get_path_func(request.form["path_id"])
+
+
+@app.route("/create_path_from_nodes", methods=["POST"])
+@login_required
+@attribute_required("title")
+@attribute_required("description")
+@attribute_required("node_ids")
+@attribute_required("positions")
+def create_path_from_nodes():
+    node_ids = request.form.getlist("node_ids", type=str)
+    positions = request.form.getlist("positions", type=int)
+
+    return create_path_from_nodes_func(
+        request.form["username"],
+        request.form["title"],
+        request.form["description"],
+        node_ids,
+        positions,
+    )
+
+
+@app.route("/update_path_playcount", methods=["POST"])
+@attribute_required("path_id")
+def update_path_playcount():
+    return update_path_playcount_func(request.form["path_id"])
+
+
+@app.route("/update_path_rating", methods=["POST"])
+@login_required
+@attribute_required("path_id")
+@attribute_required("rating")
+def update_path_rating():
+    # check if rating is a number
+    try:
+        rating = int(request.form["rating"])
+    except ValueError:
+        return {"message": "rating is not an int"}, 404
+
+    return update_path_rating_func(request.form["path_id"], rating)
+
+
+@app.route("/update_path_title", methods=["POST"])
+@login_required
+@attribute_required("path_id")
+@attribute_required("title")
+def update_path_title():
+    return update_path_title_func(
+        request.form["username"], request.form["path_id"], request.form["title"]
+    )
+
+
+@app.route("/update_path_description", methods=["POST"])
+@login_required
+@attribute_required("path_id")
+@attribute_required("description")
+def update_path_description():
+    return update_path_description_func(
+        request.form["username"], request.form["path_id"], request.form["description"]
+    )
+
+
+@app.route("/get_user_paths", methods=["GET"])
+@attribute_required("username")
+def get_user_paths():
+    return get_user_paths_func(request.form["username"])
+
+
+@app.route("/get_node_paths", methods=["GET"])
+@attribute_required("node_id")
+def get_node_paths():
+    return get_node_paths_func(request.form["node_id"])
 
 
 if __name__ == "__main__":
