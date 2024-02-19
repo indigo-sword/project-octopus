@@ -20,14 +20,14 @@ from datetime import datetime
 class Path(Base):
     __tablename__ = "paths"
     id = Column(String, primary_key=True, default=lambda: str(uuid4()), unique=True)
-    user_id = Column(Integer, ForeignKey("users.username"))
+    user_id = Column(String, ForeignKey("users.username"))
     description = Column(String)
     ts = Column(DateTime, default=datetime.utcnow)
 
     playcount = Column(Integer)
     num_ratings = Column(Integer)
     rating = Column(Double)
-
+    position = Column(Integer)
     title = Column(String)
 
     user = relationship("User")
@@ -46,6 +46,17 @@ class Path(Base):
 
     def save(self, session: Session):
         session.add(self)
+        session.commit()
+
+    def delete(self, session: Session):
+        session.delete(self)
+        # remove all mentions to path p in db
+        session.execute(
+            path_node_association.delete().where(
+                path_node_association.c.path_id == self.id
+            )
+        )
+
         session.commit()
 
     def add_node(self, node: Node, position: int, session: Session):
@@ -117,7 +128,7 @@ class Path(Base):
 
     def update_rating(self, rating: int, session: Session):
         if rating < 0 or rating > 10:
-            raise Exception("Rating must be between 0 and 10")
+            raise Exception("rating must be between 0 and 10")
 
         result = session.execute(
             update(Path)
