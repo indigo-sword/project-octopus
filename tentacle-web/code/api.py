@@ -1,6 +1,7 @@
 from flask import Flask, request, session
 from api_func import *
 from functools import wraps
+from db_manager import Session
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectOctopusCertainlyIsNotThatSecret"
@@ -40,12 +41,15 @@ def attribute_required(attribute):
 @attribute_required("username")
 @attribute_required("password")
 def login():
-    msg, code = login_user_func(request.form["username"], request.form["password"])
+    s = Session()
+    ret, code = login_user_func(request.form["username"], request.form["password"], s)
+
     if code == 200:
         session["username"] = request.form["username"]
         session["logged_in"] = True
 
-    return {"message": msg}, code
+    Session.remove()
+    return ret, code
 
 
 @app.route("/logout", methods=["POST"])
@@ -62,78 +66,129 @@ def logout():
 @attribute_required("email")
 def create_user():
     bio = "" if not ("bio" in request.form) else request.form["bio"]
-    return create_user_func(
-        request.form["username"], request.form["password"], request.form["email"], bio
+    s = Session()
+    ret, code = create_user_func(
+        request.form["username"],
+        request.form["password"],
+        request.form["email"],
+        bio,
+        s,
     )
+
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_user", methods=["GET"])
 @attribute_required("username")
 def get_user():
-    return get_user_func(request.form["username"])
+    s = Session()
+    ret, code = get_user_func(request.form["username"], s)
+
+    Session.remove()
+    return ret, code
 
 
 @app.route("/change_user_bio", methods=["POST"])
 @login_required
 @attribute_required("bio")
 def change_user_bio():
-    return change_user_bio_func(request.form["username"], request.form["bio"])
+    s = Session()
+    ret, code = change_user_bio_func(request.form["username"], request.form["bio"], s)
+
+    Session.remove()
+    return ret, code
 
 
 @app.route("/follow_user", methods=["POST"])
 @login_required
 @attribute_required("followed_username")
 def follow_user():
-    return follow_user_func(request.form["username"], request.form["followed_username"])
+    s = Session()
+    ret, code = follow_user_func(
+        request.form["username"], request.form["followed_username"], s
+    )
+
+    Session.remove()
+    return ret, code
 
 
 @app.route("/unfollow_user", methods=["POST"])
 @login_required
 @attribute_required("unfollowed_username")
 def unfollow_user():
-    return unfollow_user_func(
-        request.form["username"], request.form["unfollowed_username"]
+    s = Session()
+    ret, code = unfollow_user_func(
+        request.form["username"], request.form["unfollowed_username"], s
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_follows", methods=["GET"])
 @attribute_required("username")
 def get_follows():
-    return get_follows_func(request.form["username"])
+    s = Session()
+    ret, code = get_follows_func(request.form["username"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/add_friend", methods=["POST"])
 @login_required
 @attribute_required("friend_username")
 def add_friend():
-    return add_friend_func(request.form["username"], request.form["friend_username"])
+    s = Session()
+    ret, code = add_friend_func(
+        request.form["username"], request.form["friend_username"], s
+    )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/accept_friend", methods=["POST"])
 @login_required
 @attribute_required("friend_username")
 def accept_friend():
-    return accept_friend_func(request.form["username"], request.form["friend_username"])
+    s = Session()
+    ret, code = accept_friend_func(
+        request.form["username"], request.form["friend_username"], s
+    )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/reject_friend", methods=["POST"])
 @login_required
 @attribute_required("friend_username")
 def reject_friend():
-    return reject_friend_func(request.form["username"], request.form["friend_username"])
+    s = Session()
+    ret, code = reject_friend_func(
+        request.form["username"], request.form["friend_username"], s
+    )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/remove_friend", methods=["POST"])
 @login_required
 @attribute_required("friend_username")
 def remove_friend():
-    return remove_friend_func(request.form["username"], request.form["friend_username"])
+    s = Session()
+    ret, code = remove_friend_func(
+        request.form["username"], request.form["friend_username"], s
+    )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_friends", methods=["GET"])
 @attribute_required("username")
 def get_friends():
-    return get_friends_func(request.form["username"])
+    s = Session()
+    ret, code = get_friends_func(request.form["username"], s)
+    Session.remove()
+    return ret, code
 
 
 ########### Node API ###########
@@ -164,21 +219,28 @@ def create_node():
         if not ("is_final" in request.form)
         else request.form["is_final"] == "true"
     )
-    return create_node_func(
+
+    s = Session()
+    ret, code = create_node_func(
         request.form["username"],
         request.form["title"],
         request.form["description"],
         file_buf,
         is_initial,
         is_final,
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
-# TODO: test test get LEVEL
 @app.route("/get_level", methods=["GET"])
 @attribute_required("node_id")
 def get_level():
-    return get_level_func(request.form["node_id"])
+    s = Session()
+    ret, code = get_level_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_node_level", methods=["POST"])
@@ -197,17 +259,21 @@ def update_node_level():
 
     file_buf.seek(0)
 
-    return update_node_level_func(
-        request.form["username"],
-        request.form["node_id"],
-        file_buf,
+    s = Session()
+    ret, code = update_node_level_func(
+        request.form["username"], request.form["node_id"], file_buf, s
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_node", methods=["GET"])
 @attribute_required("node_id")
 def get_node():
-    return get_node_func(request.form["node_id"])
+    s = Session()
+    ret, code = get_node_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/link_nodes", methods=["POST"])
@@ -216,30 +282,43 @@ def get_node():
 @attribute_required("destination_id")
 @attribute_required("description")
 def link_nodes():
-    return link_nodes_func(
+    s = Session()
+    ret, code = link_nodes_func(
         request.form["username"],
         request.form["origin_id"],
         request.form["destination_id"],
         request.form["description"],
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_next_links", methods=["GET"])
 @attribute_required("node_id")
 def get_next_links():
-    return get_next_links_func(request.form["node_id"])
+    s = Session()
+    ret, code = get_next_links_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_previous_links", methods=["GET"])
 @attribute_required("node_id")
 def get_previous_links():
-    return get_previous_links_func(request.form["node_id"])
+    s = Session()
+    ret, code = get_previous_links_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_playcount", methods=["POST"])
 @attribute_required("node_id")
 def update_playcount():
-    return update_playcount_func(request.form["node_id"])
+    s = Session()
+    ret, code = update_playcount_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_rating", methods=["POST"])
@@ -253,7 +332,10 @@ def update_rating():
     except ValueError:
         return {"message": "rating is not a number"}, 404
 
-    return update_rating_func(request.form["node_id"], rating)
+    s = Session()
+    ret, code = update_rating_func(request.form["node_id"], rating, s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_node_description", methods=["POST"])
@@ -261,9 +343,15 @@ def update_rating():
 @attribute_required("node_id")
 @attribute_required("description")
 def update_node_description():
-    return update_node_description_func(
-        request.form["username"], request.form["node_id"], request.form["description"]
+    s = Session()
+    ret, code = update_node_description_func(
+        request.form["username"],
+        request.form["node_id"],
+        request.form["description"],
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_node_title", methods=["POST"])
@@ -271,9 +359,12 @@ def update_node_description():
 @attribute_required("node_id")
 @attribute_required("title")
 def update_node_title():
-    return update_node_title_func(
-        request.form["username"], request.form["node_id"], request.form["title"]
+    s = Session()
+    ret, code = update_node_title_func(
+        request.form["username"], request.form["node_id"], request.form["title"], s
     )
+    Session.remove()
+    return ret, code
 
 
 ########### Path API ###########
@@ -282,9 +373,12 @@ def update_node_title():
 @attribute_required("title")
 @attribute_required("description")
 def create_path():
-    return create_path_func(
-        request.form["username"], request.form["title"], request.form["description"]
+    s = Session()
+    ret, code = create_path_func(
+        request.form["username"], request.form["title"], request.form["description"], s
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/add_to_path", methods=["POST"])
@@ -299,18 +393,25 @@ def add_to_path():
     except ValueError:
         return {"message": "position is not a number"}, 404
 
-    return add_to_path_func(
+    s = Session()
+    ret, code = add_to_path_func(
         request.form["username"],
         request.form["path_id"],
         request.form["node_id"],
         position,
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_path", methods=["GET"])
 @attribute_required("path_id")
 def get_path():
-    return get_path_func(request.form["path_id"])
+    s = Session()
+    ret, code = get_path_func(request.form["path_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/create_path_from_nodes", methods=["POST"])
@@ -323,19 +424,26 @@ def create_path_from_nodes():
     node_ids = request.form.getlist("node_ids", type=str)
     positions = request.form.getlist("positions", type=int)
 
-    return create_path_from_nodes_func(
+    s = Session()
+    ret, code = create_path_from_nodes_func(
         request.form["username"],
         request.form["title"],
         request.form["description"],
         node_ids,
         positions,
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_path_playcount", methods=["POST"])
 @attribute_required("path_id")
 def update_path_playcount():
-    return update_path_playcount_func(request.form["path_id"])
+    s = Session()
+    ret, code = update_path_playcount_func(request.form["path_id"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_path_rating", methods=["POST"])
@@ -349,7 +457,10 @@ def update_path_rating():
     except ValueError:
         return {"message": "rating is not an int"}, 404
 
-    return update_path_rating_func(request.form["path_id"], rating)
+    s = Session()
+    ret, code = update_path_rating_func(request.form["path_id"], rating, s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_path_title", methods=["POST"])
@@ -357,9 +468,12 @@ def update_path_rating():
 @attribute_required("path_id")
 @attribute_required("title")
 def update_path_title():
-    return update_path_title_func(
-        request.form["username"], request.form["path_id"], request.form["title"]
+    s = Session()
+    ret, code = update_path_title_func(
+        request.form["username"], request.form["path_id"], request.form["title"], s
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/update_path_description", methods=["POST"])
@@ -367,21 +481,33 @@ def update_path_title():
 @attribute_required("path_id")
 @attribute_required("description")
 def update_path_description():
-    return update_path_description_func(
-        request.form["username"], request.form["path_id"], request.form["description"]
+    s = Session()
+    ret, code = update_path_description_func(
+        request.form["username"],
+        request.form["path_id"],
+        request.form["description"],
+        s,
     )
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_user_paths", methods=["GET"])
 @attribute_required("username")
 def get_user_paths():
-    return get_user_paths_func(request.form["username"])
+    s = Session()
+    ret, code = get_user_paths_func(request.form["username"], s)
+    Session.remove()
+    return ret, code
 
 
 @app.route("/get_node_paths", methods=["GET"])
 @attribute_required("node_id")
 def get_node_paths():
-    return get_node_paths_func(request.form["node_id"])
+    s = Session()
+    ret, code = get_node_paths_func(request.form["node_id"], s)
+    Session.remove()
+    return ret, code
 
 
 if __name__ == "__main__":
