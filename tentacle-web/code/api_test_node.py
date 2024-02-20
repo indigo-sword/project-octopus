@@ -2,7 +2,7 @@ import requests
 import random
 import string
 
-url = f"http://localhost:7809/"
+url = f"http://64.225.11.30:8080/"
 
 import unittest
 import os
@@ -57,9 +57,6 @@ class TestApiNode(unittest.TestCase):
                 i = response.json()["node_id"]
 
             os.remove("files/test.txt")
-
-            with open("../levels/" + i + ".level", "rb") as f:
-                self.assertEqual(f.read(), b"THIS TEST HAS PASSED! 11")
 
         with self.subTest(msg="create node no title"):
             with open("files/test.txt", "wb") as f:
@@ -1560,7 +1557,7 @@ class TestApiNode(unittest.TestCase):
 
 
 def main():
-    unittest.main()
+    unittest.main(warnings="ignore")
 
 
 if __name__ == "__main__":

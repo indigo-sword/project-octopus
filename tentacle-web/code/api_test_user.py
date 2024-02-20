@@ -2,7 +2,7 @@ import requests
 import random
 import string
 
-url = f'http://localhost:7809/'
+url = f"http://64.225.11.30:8080/"
 
 import unittest
 import os
@@ -1911,7 +1911,7 @@ class TestApiUser(unittest.TestCase):
             self.assertEqual(response.json()["message"], "wrong user for request")
 
 def main():
-    unittest.main()
+    unittest.main(warnings="ignore")
 
 if __name__ == "__main__":
     main()

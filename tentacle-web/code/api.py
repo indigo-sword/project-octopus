@@ -510,5 +510,23 @@ def get_node_paths():
     return ret, code
 
 
+def custom_logger(environ, start_response):
+    remote_address = environ.get("REMOTE_ADDR", "UNKNOWN")
+    request_method = environ.get("REQUEST_METHOD", "UNKNOWN")
+    path_info = environ.get("PATH_INFO", "UNKNOWN")
+    query_string = environ.get("QUERY_STRING", "UNKNOWN")
+
+    print(f"Request from: {remote_address}")
+    print(f"Method: {request_method}")
+    print(f"Path: {path_info}")
+
+    return app(environ, start_response)
+
+
 if __name__ == "__main__":
-    app.run(host="localhost", port=7809)
+    from waitress import serve
+
+    host = "0.0.0.0"
+    port = 8080
+    print(f"Running server on host {host} at port {port}")
+    serve(custom_logger, host=host, port=port)
