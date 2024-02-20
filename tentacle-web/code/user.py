@@ -34,9 +34,9 @@ class User(Base):
         self.bio = bio
         self.following = 0
         self.followers = 0
-        self._save(session)
+        self.save(session)
 
-    def _save(self, session: Session):
+    def save(self, session: Session):
         session.add(self)
         session.commit()
 
@@ -46,7 +46,7 @@ class User(Base):
     def update_bio(self, session: Session, bio: str):
         """update bio"""
         self.bio = bio
-        self._save(session)
+        self.save(session)
 
     def add_follower(self, session: Session):
         """update followers"""
@@ -58,7 +58,7 @@ class User(Base):
         )
 
         self.followers = result.scalar()
-        self._save(session)
+        self.save(session)
 
     def remove_follower(self, session: Session):
         """update followers"""
@@ -70,17 +70,17 @@ class User(Base):
         )
 
         self.followers = result.scalar()
-        self._save(session)
+        self.save(session)
 
     def add_following(self, session: Session):
         """update following"""
         self.following += 1
-        self._save(session)
+        self.save(session)
 
     def remove_following(self, session: Session):
         """update following"""
         self.following -= 1
-        self._save(session)
+        self.save(session)
 
     def follow(self, session: Session, user: "User"):
         """follow user"""
