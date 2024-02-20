@@ -1,7 +1,7 @@
 <div style="text-align: center;">
   <h1>Project Octopus</h1>
   <h3>A node-based history game</h3>
-  <image style="display: block; margin-left: auto; margin-right: auto; width: 25%;" src="images/octopus.png"/>
+  <image style="display: block; margin-left: auto; margin-right: auto; width: 10%;" src="images/octopus.png"/>
 </div>
 
 #### What is Project Octopus?
