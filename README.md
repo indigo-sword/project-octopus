@@ -6,7 +6,7 @@
   <h6>2024</h6>
 
   <a href="https://discord.gg/ZgnjVCcAax">
-    <img src="https://img.shields.io/discord/890000000000000000?label=Discord&logo=discord" alt="Discord">
+    <img src="https://img.shields.io/discord/1197241804588855437?label=Discord&logo=discord" alt="Discord"> </a>
 </div>
 
 #### What is Project Octopus?
