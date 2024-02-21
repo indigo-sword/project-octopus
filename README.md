@@ -5,8 +5,8 @@
   <h5>Team Indigo Sword</h5>
   <h6>2024</h6>
 
-  <a href="https://discord.gg/ZgnjVCcAax">
-    <img src="https://img.shields.io/discord/1197241804588855437?label=Discord&logo=discord" alt="Discord"> </a>
+  <a href="https://discord.gg/dMyUErVjV9x">
+    <img src="https://img.shields.io/discord/1209242387440730163?label=Discord&logo=discord" alt="Discord"> </a>
 </div>
 
 #### What is Project Octopus?
