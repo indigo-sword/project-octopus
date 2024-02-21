@@ -1,7 +1,7 @@
 <div style="text-align: center;" align="center">
   <h1>Project Octopus</h1>
   <h3>A node-based history game</h3>
-  <image style="display: block; margin-left: auto; margin-right: auto; width: 10%;" src="images/octopus.png"/>
+  <image style="display: block; margin-left: auto; margin-right: auto; width: 10%; border-radius: 10%;" src="images/octopus.png"/>
   <h5>Team Indigo Sword</h5>
   <h6>2024</h6>
 
@@ -23,7 +23,14 @@
 
 - This repository contains TentacleWeb, the server-side code for the game. It is implemented in Python, using the Flask - SQLAlchemy framework. Check it in tentacle-web/code. It is made basically of API, class codes and unit tests.
 - The 3 basic pillars of TentacleWeb are the Node, Path and User classes, which are used to store the game's data.
-- Node is a class that represents a level in the game. It contains the level's data, such as its name, description, and the path it belongs to. You can perform a series of actions on it, which will be interfaced through the client
+- Node is a class that represents a level in the game. It contains the level's data, such as its name, description, and the path it belongs to. You can perform a series of actions on it, which will be interfaced through the client.
+
+##### Check out our architecture
+
+- This also contains our tech stack.
+<div style="text-align: center;" align="center">
+  <image style="display: block; margin-left: auto; margin-right: auto; width: 80%; border-radius: 10%;" src="images/arch.png"/>
+</div>
 
 #### Contributing to the project
 
@@ -55,6 +62,13 @@ python3 [program]_test.py
 - If you need help, please feel free to open an issue in the repository. We will be happy to help you.
 - If you want to contact us, please enter [our discord server](https://discord.gg/ZgnjVCcAax)
 
+#### Documentation links
+
+- Flask: [Flask](https://flask.palletsprojects.com/en/3.0.x/)
+- SQLAlchemy: [SQLAlchemy](https://www.sqlalchemy.org/)
+- Python: [Python](https://www.python.org/)
+- Project Octopus: [Project Octopus](projectoctopus.org)
+
 #### Current TODOs
 
 - [x] Server code
@@ -64,8 +78,14 @@ python3 [program]_test.py
 - [ ] Level editor
 - [ ] Game Documentation
 
+#### Contributors
+
+**Be the first to contribute!**
+
+- We would love to have someone contribute to our project. If you want to be the first, please feel free to fork the repository and submit a pull request. Check out the [Contributing to the project](#contributing-to-the-project) section for more information.
+
 #### License
 
-##### Defend free software!
+**Defend free software!**
 
-- This project uses GNU GPL v3.0. Check the LICENSE file for more information.
+- This project uses GNU GPL v3.0. Check the license file of this repository for more information: [License](https://github.com/indigo-sword/project-octopus/blob/main/LICENSE).
