@@ -1,12 +1,17 @@
-<div style="text-align: center;">
+<div style="text-align: center;" align="center">
   <h1>Project Octopus</h1>
   <h3>A node-based history game</h3>
   <image style="display: block; margin-left: auto; margin-right: auto; width: 10%;" src="images/octopus.png"/>
+  <h5>Team Indigo Sword</h5>
+  <h6>2024</h6>
+
+  <a href="https://discord.gg/ZgnjVCcAax">
+    <img src="https://img.shields.io/discord/890000000000000000?label=Discord&logo=discord" alt="Discord">
 </div>
 
 #### What is Project Octopus?
 
-- Project Octopus is a **node-based** game, where each node is a level in a **path** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users.
+- Project Octopus is a **node-based** game, where each node is a level in a **path** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users. If you want to know more, please check [Project Octopus](projectoctopus.org)
 
 #### What is the game like?
 
@@ -30,7 +35,7 @@
 - Clone the repository
 - Install the requirements
 
-#### Run the server
+##### Run the server
 
 ```bash
 git clone
@@ -44,6 +49,11 @@ python3 api.py
 ```bash
 python3 [program]_test.py
 ```
+
+#### Where to get help
+
+- If you need help, please feel free to open an issue in the repository. We will be happy to help you.
+- If you want to contact us, please enter [our discord server](https://discord.gg/ZgnjVCcAax)
 
 #### Current TODOs
 
