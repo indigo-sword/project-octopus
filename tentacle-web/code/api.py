@@ -518,6 +518,7 @@ def logger(environ, start_response):
     print(f"Request from: {remote_address}")
     print(f"Method: {request_method}")
     print(f"Path: {path_info}")
+    print("--------------------------")
 
     return app(environ, start_response)
 
@@ -528,4 +529,5 @@ if __name__ == "__main__":
     host = "0.0.0.0"
     port = 8080
     print(f"Running server on host {host} at port {port}")
+    print("--------------------------")
     serve(logger, host=host, port=port)

@@ -1,6 +1,6 @@
 <div style="text-align: center;" align="center">
   <h1>Project Octopus</h1>
-  <h3>A node-based history game</h3>
+  <h3>A branch-based history game</h3>
   <image style="display: block; margin-left: auto; margin-right: auto; width: 10%; border-radius: 10%;" src="images/octopus.png"/>
   <h5>Team Indigo Sword</h5>
   <h6>2024</h6>
@@ -11,7 +11,7 @@
 
 #### What is Project Octopus?
 
-- Project Octopus is a **node-based** game, where each node is a level in a **path** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users. If you want to know more, please check [Project Octopus](projectoctopus.org)
+- Project Octopus is a **branch-based** game, where each node is a level in a **branch** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users. If you want to know more, please check [Project Octopus](projectoctopus.org)
 
 #### What is the game like?
 
@@ -72,11 +72,11 @@ python3 [program]_test.py
 #### Current TODOs
 
 - [x] Server code
-- [ ] Client code
-- [ ] Backend documentation
-- [ ] Game code
-- [ ] Level editor
-- [ ] Game Documentation
+- [ ] Client code (WIP)
+- [x] Backend documentation
+- [ ] Game code (WIP)
+- [ ] Level editor (WIP)
+- [ ] Game Design Document
 
 #### Contributors
 

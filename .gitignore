@@ -1,2 +1,4 @@
 tentacle-web/levels/*
 tentacle-web/code/tentacle-web.sqlite
+tentacle-web/code/__pycache__
+tentacle-web/code/__pycache__/*
