@@ -8,7 +8,6 @@ from uuid import uuid4
 import random
 import string
 from werkzeug.datastructures.file_storage import FileStorage
-import tempfile
 
 
 def random_email():

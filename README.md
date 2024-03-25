@@ -45,13 +45,17 @@
 ##### Run the server
 
 ```bash
-git clone
-cd tentacle-web
-export FLASK_APP=api
+git clone https://github.com/indigo-sword/project-octopus.git
+cd project-octopus/tentacle-web/code
+pip install -r requirements.txt
+python3
+  >>> python3: 
+  >>> from db_manager import init_db
+  >>> init_db()
 python3 api.py
 ```
 
-- Run the test scripts if you want
+- Run the test scripts if you want to check everything is working. First, run the server and then in another terminal run:
 
 ```bash
 python3 [program]_test.py

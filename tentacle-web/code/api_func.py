@@ -7,7 +7,6 @@ from werkzeug.datastructures import FileStorage
 from flask import send_file
 import os
 from sqlalchemy.orm import Session
-from typing import *
 
 
 def login_user_func(username: str, password: str, session: Session):
@@ -26,7 +25,7 @@ def login_user_func(username: str, password: str, session: Session):
 
 def create_user_func(
     username: str, password: str, email: str, bio: str, session: Session
-) -> Tuple[Dict[str, str], int]:
+):
     """create user"""
     # perform email regex check
     if not re.match(r"^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$", email):

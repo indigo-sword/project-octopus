@@ -1,0 +1,6 @@
+flask
+bcrypt
+werkzeug
+sqlalchemy
+uuid
+datetime
