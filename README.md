@@ -44,6 +44,9 @@
 
 ##### Run the server
 
+- If you want not only to run, but also **code** the server, check its documentation on the tentacle-web folder
+
+- If you want to run the server, follow these steps:
 ```bash
 git clone https://github.com/indigo-sword/project-octopus.git
 cd project-octopus/tentacle-web/code
@@ -74,13 +77,14 @@ python3 [program]_test.py
 - Project Octopus: [Project Octopus](projectoctopus.org)
 
 #### Current TODOs
+- Check our project's board for more detailed information on what we are working on: [Project Octopus Board](https://github.com/orgs/indigo-sword/projects/1)
 
 - [x] Server code
 - [ ] Client code (WIP)
 - [x] Backend documentation
 - [ ] Game code (WIP)
 - [ ] Level editor (WIP)
-- [ ] Game Design Document
+- [ ] Game Design Document (WIP)
 
 #### Contributors
 
