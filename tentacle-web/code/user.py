@@ -41,7 +41,7 @@ class User(Base):
         session.commit()
 
     def __repr__(self):
-        return f"User({self.id}, {self.username}, {self.email}, {self.bio}, {self.ts})"
+        return f"User({self.username}, {self.email}, {self.bio}, {self.ts})"
 
     def update_bio(self, session: Session, bio: str):
         """update bio"""
