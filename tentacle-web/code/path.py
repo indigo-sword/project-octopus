@@ -126,7 +126,7 @@ class Path(Base):
 
         session.commit()
 
-    def update_rating(self, rating: int, session: Session):
+    def update_rating(self, rating: float, session: Session):
         if rating < 0 or rating > 10:
             raise Exception("rating must be between 0 and 10")
 

@@ -16,11 +16,10 @@ def login_user_func(username: str, password: str, session: Session):
     if not u:
         return {"message": "user not found"}, 404
 
-    if bcrypt.checkpw(password.encode("utf-8"), u.password):
-        return {"message": "user logged in"}, 200
-
-    else:
+    if not bcrypt.checkpw(password.encode("utf-8"), u.password):
         return {"message": "invalid password"}, 401
+
+    return {"message": "user logged in", "username": username}, 200
 
 
 def create_user_func(
@@ -117,7 +116,9 @@ def get_user_func(username: str, session: Session):
         "followers": u.followers,
     }, 200
 
-
+######################################################
+######## FRIEND AND FOLLOW STUFF NOT USED YET ########
+######################################################
 def add_friend_func(username: str, friend_username: str, session: Session):
     """add friend"""
     u = session.query(User).filter(User.username == username).first()
@@ -211,7 +212,9 @@ def get_friends_func(username: str, session: Session):
         "requests": u.get_friend_requests(session),
         "sent requests": u.get_friend_requests_sent(session),
     }, 200
-
+######################################################
+######## FRIEND AND FOLLOW STUFF NOT USED YET ########
+######################################################
 
 def create_node_func(
     username: str,
@@ -234,7 +237,6 @@ def create_node_func(
         return {"message": "node creation failed. try again."}, 400
 
     return {"message": "node created", "node_id": n.id}, 201
-
 
 def get_node_func(node_id: str, session: Session):
     """get node"""
@@ -392,7 +394,11 @@ def get_level_func(node_id: str, session: Session):
     if not os.path.exists(path):
         return {"message": "level not found"}, 404
 
-    return send_file(path, as_attachment=True), 200
+    content = "" 
+    with open(path) as f:
+        content = f.read()
+
+    return {"message": "level", "level": content, "node_id": node_id}, 200
 
 
 def create_path_func(username: str, title: str, description: str, session: Session):
@@ -496,7 +502,7 @@ def update_path_playcount_func(path_id: str, session: Session):
     return {"message": "path playcount updated", "playcount": p.playcount}, 200
 
 
-def update_path_rating_func(path_id: str, rating: int, session: Session):
+def update_path_rating_func(path_id: str, rating: float, session: Session):
     """update path rating"""
     p = session.query(Path).filter(Path.id == path_id).first()
     if not p:

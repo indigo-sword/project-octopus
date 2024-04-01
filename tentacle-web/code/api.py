@@ -209,16 +209,8 @@ def create_node():
 
     file_buf.seek(0)
 
-    is_initial = (
-        False
-        if not ("is_initial" in request.form)
-        else request.form["is_initial"] == "true"
-    )
-    is_final = (
-        False
-        if not ("is_final" in request.form)
-        else request.form["is_final"] == "true"
-    )
+    is_initial = request.form.get("is_initial", False) == "true"
+    is_final = request.form.get("is_final", False) == "true"
 
     s = Session()
     ret, code = create_node_func(
@@ -291,6 +283,7 @@ def link_nodes():
         s,
     )
     Session.remove()
+
     return ret, code
 
 
@@ -453,7 +446,7 @@ def update_path_playcount():
 def update_path_rating():
     # check if rating is a number
     try:
-        rating = int(request.form["rating"])
+        rating = float(request.form["rating"])
     except ValueError:
         return {"message": "rating is not an int"}, 404
 
@@ -514,7 +507,6 @@ def logger(environ, start_response):
     remote_address = environ.get("REMOTE_ADDR", "UNKNOWN")
     request_method = environ.get("REQUEST_METHOD", "UNKNOWN")
     path_info = environ.get("PATH_INFO", "UNKNOWN")
-
     print(f"Request from: {remote_address}")
     print(f"Method: {request_method}")
     print(f"Path: {path_info}")
