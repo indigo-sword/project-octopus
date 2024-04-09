@@ -2,6 +2,7 @@ from flask import Flask, request, session
 from api_func import *
 from functools import wraps
 from db_manager import Session
+from datetime import datetime
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectOctopusCertainlyIsNotThatSecret"
@@ -304,7 +305,6 @@ def get_previous_links():
     Session.remove()
     return ret, code
 
-
 @app.route("/update_playcount", methods=["POST"])
 @attribute_required("node_id")
 def update_playcount():
@@ -502,7 +502,16 @@ def get_node_paths():
     Session.remove()
     return ret, code
 
+########### Queries API ###########
+@app.route("/query_users", methods=["GET"])
+@attribute_required("query")
+def query_users():
+    s = Session()
+    ret, code = query_users_func(request.form["query"], s)
+    Session.remove()
+    return ret, code
 
+########### API ###########
 def logger(environ, start_response):
     remote_address = environ.get("REMOTE_ADDR", "UNKNOWN")
     request_method = environ.get("REQUEST_METHOD", "UNKNOWN")
@@ -510,6 +519,7 @@ def logger(environ, start_response):
     print(f"Request from: {remote_address}")
     print(f"Method: {request_method}")
     print(f"Path: {path_info}")
+    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("--------------------------")
 
     return app(environ, start_response)

@@ -79,4 +79,10 @@
 
 \*: This variable needs to be a list. It should be in the request's _form_ attribute under the key *node_ids\* or *positions\*.
 
+- To restart your daemon and api: 
+```bash
+  sudo systemctl daemon-reload 
+  sudo systemctl restart api
+```
+
 - If you want to interact with the API using some other language and don't want to learn flask in depth (like we had to do over here to interface it), check our Client's documentation on [our game's repo](https://github.com/indigo-sword/godot-3.5) 

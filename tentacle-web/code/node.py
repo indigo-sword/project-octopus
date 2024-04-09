@@ -30,7 +30,7 @@ class NodeLink(Base):
         Integer, ForeignKey("nodes.id")
     )  # id of the destination node
     description = Column(String)
-    ts = Column(DateTime, default=datetime.utcnow)
+    ts = Column(String, default=datetime.now().strftime('%Y-%m-%d'))
 
     origin = relationship("Node", foreign_keys=[origin_id])
     destination = relationship("Node", foreign_keys=[destination_id])
@@ -99,6 +99,20 @@ class Node(Base):
 
     def _write_file(self, lvl_buf: FileStorage):
         lvl_buf.save(self.get_file_path())
+
+    def get_info(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "title": self.title,
+            "playcount": self.playcount,
+            "num_ratings": self.num_ratings,
+            "rating": self.get_rating(),
+            "description": self.description,
+            "is_initial": self.is_initial,
+            "is_final": self.is_final,
+            "ts": self.ts,
+        }
 
     def get_file_path(self):
         # get project root

@@ -19,7 +19,12 @@ def login_user_func(username: str, password: str, session: Session):
     if not bcrypt.checkpw(password.encode("utf-8"), u.password):
         return {"message": "invalid password"}, 401
 
-    return {"message": "user logged in", "username": username}, 200
+    return {"message": "user logged in", 
+            "username": u.username,
+            "bio": u.bio,
+            "email": u.email,
+            "following": u.following,
+            "followers": u.followers}, 200
 
 
 def create_user_func(
@@ -107,6 +112,8 @@ def get_user_func(username: str, session: Session):
     if not u:
         return {"message": "user not found"}, 404
 
+    nodes = session.query(Node).filter(Node.user_id == username).all()
+
     return {
         "message": "user info",
         "username": u.username,
@@ -114,6 +121,8 @@ def get_user_func(username: str, session: Session):
         "email": u.email,
         "following": u.following,
         "followers": u.followers,
+
+        "nodes": [n.get_info() for n in nodes]
     }, 200
 
 ######################################################
@@ -556,7 +565,6 @@ def get_user_paths_func(username: str, session: Session):
         "paths": [path_info(p, session) for p in paths],
     }, 200
 
-
 def get_node_paths_func(node_id: str, session: Session):
     n = session.query(Node).filter(Node.id == node_id).first()
     if not n:
@@ -577,6 +585,15 @@ def get_node_paths_func(node_id: str, session: Session):
             path_info(p, session)
             for p in session.query(Path).filter(Path.id.in_(s)).all()
         ],
+    }, 200
+
+def query_users_func(query: str, s: Session):
+    # query for users that have name like the query, case insensitive
+    users = s.query(User).filter(User.username.ilike(f"%{query}%")).all()
+
+    return {
+        "message": "users found",
+        "users": [u.get_info() for u in users],
     }, 200
 
 

@@ -40,6 +40,15 @@ class User(Base):
         session.add(self)
         session.commit()
 
+    def get_info(self):
+        return {
+            "username": self.username,
+            "bio": self.bio,
+            "ts": self.ts,
+            "following": self.following,
+            "followers": self.followers,
+        }
+
     def __repr__(self):
         return f"User({self.username}, {self.email}, {self.bio}, {self.ts})"
 
