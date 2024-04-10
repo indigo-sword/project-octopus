@@ -511,6 +511,36 @@ def query_users():
     Session.remove()
     return ret, code
 
+@app.route("/query_nodes", methods=["GET"])
+@attribute_required("query")
+def query_nodes():
+    s = Session()
+    ret, code = query_nodes_func(request.form["query"], s)
+    Session.remove()
+    return ret, code
+
+@app.route("/query_paths", methods=["GET"])
+@attribute_required("query")
+def query_paths():
+    s = Session()
+    ret, code = query_paths_func(request.form["query"], s)
+    Session.remove()
+    return ret, code
+
+@app.route("/get_popular_paths", methods=["GET"])
+def get_popular_paths():
+    s = Session()
+    ret, code = get_popular_paths_func(s)
+    Session.remove()
+    return ret, code
+
+@app.route("/get_popular_nodes", methods=["GET"])
+def get_popular_nodes():
+    s = Session()
+    ret, code = get_popular_nodes_func(s)
+    Session.remove()
+    return ret, code
+
 ########### API ###########
 def logger(environ, start_response):
     remote_address = environ.get("REMOTE_ADDR", "UNKNOWN")

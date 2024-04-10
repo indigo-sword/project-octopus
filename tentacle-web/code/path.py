@@ -104,12 +104,27 @@ class Path(Base):
         session.commit()
 
     def get_node_sequence(self, session: Session):
-        return (
-            session.query(path_node_association)
-            .filter(path_node_association.c.path_id == self.id)
-            .order_by(path_node_association.c.position)
+        nodes_and_positions = (
+            session.query(path_node_association)  
+            .filter(path_node_association.c.path_id == self.id)     
+            .order_by(path_node_association.c.position)            
             .all()
         )
+        
+        node_ids = [node_id for _, node_id, _ in nodes_and_positions]
+        positions = [position for _, _, position in nodes_and_positions]
+        
+        nodes = (
+            session.query(Node)
+            .filter(Node.id.in_(node_ids))
+            .order_by(
+                # Order by the order of appearance in the node_ids list
+                Node.id.in_(node_ids).desc()
+            )
+            .all()
+        )
+
+        return nodes, positions
 
     def __repr__(self):
         return f"Path({self.id}, {self.user_id}, {self.description}, {self.ts})"

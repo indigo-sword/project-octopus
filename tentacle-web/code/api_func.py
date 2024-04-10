@@ -7,6 +7,7 @@ from werkzeug.datastructures import FileStorage
 from flask import send_file
 import os
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 
 def login_user_func(username: str, password: str, session: Session):
@@ -589,16 +590,61 @@ def get_node_paths_func(node_id: str, session: Session):
 
 def query_users_func(query: str, s: Session):
     # query for users that have name like the query, case insensitive
-    users = s.query(User).filter(User.username.ilike(f"%{query}%")).all()
+    users = s.query(User).filter(User.username.ilike(f"%{query}%")).limit(20).all()
 
     return {
         "message": "users found",
         "users": [u.get_info() for u in users],
     }, 200
 
+def query_nodes_func(query: str, s: Session):
+    # query for nodes that have title like the query, case insensitive
+    nodes = s.query(Node).filter(
+        or_(
+            Node.title.ilike(f"%{query}%"),
+            Node.user_id.ilike(f"%{query}%")
+        )
+    ).order_by(Node.playcount.desc()).limit(20).all()
+
+    return {
+        "message": "nodes found",
+        "nodes": [n.get_info() for n in nodes],
+    }, 200
+
+def query_paths_func(query: str, s: Session):
+    # query for paths that have title like the query, case insensitive
+    paths = s.query(Path).filter(
+        or_(
+            Path.title.ilike(f"%{query}%"),
+            Path.user_id.ilike(f"%{query}%")
+        )
+    ).order_by(Path.playcount.desc()).limit(20).all()
+
+    return {
+        "message": "paths found",
+        "paths": [path_info(p, s) for p in paths],
+    }, 200
+
+def get_popular_paths_func(s: Session):
+    # get 20 most popular paths
+    paths = s.query(Path).order_by(Path.playcount.desc()).limit(20).all()
+
+    return {
+        "message": "popular paths",
+        "paths": [path_info(p, s) for p in paths],
+    }, 200
+
+def get_popular_nodes_func(s: Session):
+    # get 20 most popular nodes
+    nodes = s.query(Node).order_by(Node.playcount.desc()).limit(20).all()
+
+    return {
+        "message": "popular nodes",
+        "nodes": [n.get_info() for n in nodes],
+    }, 200
 
 def path_info(p: Path, session: Session):
-    node_seq = p.get_node_sequence(session)
+    node_seq, positions = p.get_node_sequence(session)
 
     return {
         "path_id": p.id,
@@ -608,6 +654,5 @@ def path_info(p: Path, session: Session):
         "num_ratings": p.num_ratings,
         "rating": p.rating,
         "playcount": p.playcount,
-        "node_sequence": [n.node_id for n in node_seq],
-        "positions": [n.position for n in node_seq],
+        "node_sequence": [{"node": n.get_info(), "position": pos} for n, pos in zip(node_seq, positions)],
     }
