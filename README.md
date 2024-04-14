@@ -1,7 +1,7 @@
 <div style="text-align: center;" align="center">
-  <h1>Project Octopus</h1>
+  <h1>Branches Of Fate</h1>
   <h3>A branch-based history game</h3>
-  <image style="display: block; margin-left: auto; margin-right: auto; width: 10%; border-radius: 10%;" src="images/octopus.png"/>
+  <image style="display: block; margin-left: auto; margin-right: auto; width: 40%; border-radius: 10%;" src="images/branches_of_fate.png"/>
   <h5>Team Indigo Sword</h5>
   <h6>2024</h6>
 
@@ -9,13 +9,13 @@
     <img src="https://img.shields.io/discord/1209242387440730163?label=Discord&logo=discord" alt="Discord"> </a>
 </div>
 
-#### What is Project Octopus?
+#### What is Branches of Fate?
 
-- Project Octopus is a **branch-based** game, where each node is a level in a **branch** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users. If you want to know more, please check [Project Octopus](projectoctopus.org)
+- Branches of Fate (called Project Octopus in initial stages) is a **branch-based** game, where each piece is a level in a **branch** (or storyline) you are playing. Designed to be a **single-player** game with online features, it allows users to create their own nodes and paths and share them with others - either via popularity or by befriending other users. If you want to know more, please check [Project Octopus](projectoctopus.org)
 
 #### What is the game like?
 
-- Team Indigo Sword is developing Project Octopus to be a top-down 2D soulslike game, set in a medieval cyberpunk environment. You will play as a fallen corporate knight, who quit their job after realizing the company's true intentions. You will have to fight your way through the company's defenses, and uncover the truth behind the company's actions.
+- Team Indigo Sword is developing Branches Of Fate to be a top-down 2D soulslike game, set in a medieval cyberpunk environment. You will play as a fallen corporate knight, who quit their job after realizing the company's true intentions. You will have to fight your way through the company's defenses, and uncover the truth behind the company's actions.
 
 - In the game, you will be able to swing you sword to fight through enemies, as well as dodge, parry and heal. You will need to be careful, though, as the game will be unforgiving and you will have to learn from your mistakes. You will also need to keep your stamina bar in mind.
 
@@ -24,6 +24,7 @@
 - This repository contains TentacleWeb, the server-side code for the game. It is implemented in Python, using the Flask - SQLAlchemy framework. Check it in tentacle-web/code. It is made basically of API, class codes and unit tests.
 - The 3 basic pillars of TentacleWeb are the Node, Path and User classes, which are used to store the game's data.
 - Node is a class that represents a level in the game. It contains the level's data, such as its name, description, and the path it belongs to. You can perform a series of actions on it, which will be interfaced through the client.
+- Futurely, we want to **expand the architecture of the Path class** to allow for more complex paths by storing them in a JSON representation of a dictionary graph. (TBD)
 
 ##### Check out our architecture
 
@@ -35,12 +36,17 @@
 #### Contributing to the project
 
 - Check our [Current TODOs](#current-todos)
-- If you want to contribute to any of them, please feel free to fork the repository and submit a pull request. We will be happy to review it and merge it if it is good. We will comment as soon as possible. Just be sure to use python's PEP8 style guide and to write unit tests for your code. Also make sure to document your code properly and that other unit tests are not broken.
+- If you want to contribute to any of them, please feel free to fork the repository and submit a pull request. We will be happy to review it and merge it if it is good. We will comment as soon as possible. Just be sure to follow a consistent style guide and to write unit tests for your code. Also make sure to document your code properly and that other unit tests are not broken.
 
 #### Installation
 
 - Clone the repository
-- Install the requirements
+- Install the requirements on tentacle-web/code/requirements.txt
+``` bash
+git clone https://github.com/indigo-sword/project-octopus.git
+cd project-octopus/tentacle-web/code
+pip install -r requirements.txt
+```
 
 ##### Run the server
 
