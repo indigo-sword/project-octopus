@@ -1,15 +1,15 @@
+########### Imports ###########
 from flask import Flask, request, session
 from api_func import *
 from functools import wraps
 from db_manager import Session
 from datetime import datetime
 
+########### API Configs and wrappers ###########
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "projectOctopusCertainlyIsNotThatSecret"
 app.secret_key = "projectOctopusCertainlyIsNotThatSecret"
 
-
-########### User API ###########
 def login_required(func):
     @wraps(func)
     @attribute_required("username")
@@ -37,7 +37,7 @@ def attribute_required(attribute):
 
     return decorator
 
-
+########### User API ###########
 @app.route("/login", methods=["POST"])
 @attribute_required("username")
 @attribute_required("password")
@@ -541,7 +541,7 @@ def get_popular_nodes():
     Session.remove()
     return ret, code
 
-########### API ###########
+########### API init ###########
 def logger(environ, start_response):
     remote_address = environ.get("REMOTE_ADDR", "UNKNOWN")
     request_method = environ.get("REQUEST_METHOD", "UNKNOWN")

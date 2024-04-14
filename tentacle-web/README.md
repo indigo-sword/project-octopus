@@ -1,7 +1,7 @@
 <div style="text-align: center;" align="center">
-  <h1>Project Octopus</h1>
+  <h1>Branches Of Fate</h1>
   <h3>TentacleWeb</h3>
-  <image style="display: block; margin-left: auto; margin-right: auto; width: 10%; border-radius: 10%;" src="images/octopus.png"/>
+  <image style="display: block; margin-left: auto; margin-right: auto; width: 40%; border-radius: 10%;" src="images/branches_of_fate.png"/>
   <h5>Team Indigo Sword</h5>
   <h6>2024</h6>
 </div>
@@ -11,7 +11,7 @@
 - TentacleWeb is the server-side code for Project Octopus. It is implemented in Python, using the Flask - SQLAlchemy framework. It is made basically of API, class codes and unit tests.
 - The 3 basic pillars of TentacleWeb are the **Node**, **Path** and **User** classes, which are used sava data in a database.
 - **Node:** A class that represents a **level** in the game. It contains the level's data, such as its name, description, and its function to get its level.
-- **Path:** A sequence of **Nodes** which comprise a possible **gameplay path** for the game.
+- **Path:** A sequence of **Nodes** which comprise a possible **gameplay path** for the game. Path will be updated in the future to store JSON representations of a graph.
 - **User:** A class that represents a user in the game. It contains the user's data, such as its name, email, and password.
 - You can perform a series of actions on them, which will be interfaced through the **client**.
 
@@ -26,6 +26,9 @@
 
 - The only way to interact with the classes is through the **API**. It is made of **endpoints** that can be accessed through **HTTP** requests.
 - Here we will document each endpoint of the API with its methods and parameters. Have in mind that when we write the name of a parameter in [brackets], it means that it is optional.
+
+- **NOTE**: If you want to interact with the API using some other language and don't want to learn flask in depth (like we had to do over here to interface it), check our Client's documentation on [our game's repo](https://github.com/indigo-sword/godot-3.5) 
+
 - **User related endpoints**:
 
   | Endpoint         | Method | Parameters                       | Description                                | Needs Login? |
@@ -43,6 +46,8 @@
   | /reject_friend   | POST   | username, friend_username        | Reject a friend request.                   | yes          |
   | /remove_friend   | POST   | username, friend_username        | Remove a friend.                           | yes          |
   | /get_friends     | GET    | username                         | Get user's friends.                        | no           |
+
+- **NOTE:** The "friend" endpoints (add_friend, accept_friend, reject_friend, remove_friend, get_friends) are deprecated. We decided to use a follow system. The "follow" endpoints (follow_user, unfollow_user, get_follows) are the new way to interact with users.
 
 - **Node related endpoints**:
 
@@ -79,10 +84,43 @@
 
 \*: This variable needs to be a list. It should be in the request's _form_ attribute under the key *node_ids\* or *positions\*.
 
+- **Query-related endpoints**:
+
+| Endpoint                 | Method | Parameters                                            | Description                   | Needs Login? |
+| ------------------------ | ------ | ----------------------------------------------------- | ----------------------------- | ------------ |
+| /query_users             | GET    | query: an username                                    | Query users.                  | no           |
+| /query_nodes             | GET    | query: a node title or an username                    | Query nodes.                  | no           |
+| /query_paths             | GET    | query: a path title or an username                    | Query paths.                  | no           |
+| /get_popular_nodes       | GET    |                                                       | Get 20 most popular nodes.    | no           |
+| /get_popular_paths       | GET    |                                                       | Get 20 most popular paths.    | no           |
+
+#### Running the server constantly
+- For this, you would need to build a daemon. There is resources on the internet on how to do that. This is how I did it in my linux server:
+
+```bash
+sudo vim /etc/systemd/system/api.service
+```
+in vim:
+```
+[Unit]
+Description=Your Python Script
+After=network.target
+
+[Service]
+User=jvphenares
+WorkingDirectory=/home/jvphenares/project-octopus/tentacle-web/code
+ExecStart=/usr/bin/python3 /home/jvphenares/project-octopus/tentacle-webcode/api.py
+StandardOutput=append:/home/jvphenares/project-octopus/api.log
+StandardError=append:/home/jvphenares/project-octopus/api_error.log
+Restart=always
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+```
+
 - To restart your daemon and api: 
 ```bash
   sudo systemctl daemon-reload 
   sudo systemctl restart api
 ```
-
-- If you want to interact with the API using some other language and don't want to learn flask in depth (like we had to do over here to interface it), check our Client's documentation on [our game's repo](https://github.com/indigo-sword/godot-3.5) 
