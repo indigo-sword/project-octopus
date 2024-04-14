@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Objects/Table.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/Light.tscn" type="PackedScene" id=3]
+[ext_resource path="res://tilemap_tiles.tres" type="TileSet" id=4]
+[ext_resource path="res://Objects/SwordBasic.tscn" type="PackedScene" id=5]
+
+[node name="Level" type="Node2D"]
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = ExtResource( 4 )
+cell_size = Vector2( 16, 16 )
+format = 1
+tile_data = PoolIntArray( -65557, 7, 0, -65556, 7, 0, -65555, 7, 0, -65554, 7, 0, -65553, 7, 0, -65552, 7, 0, -65551, 7, 0, -65550, 7, 0, -65549, 7, 0, -65548, 7, 0, -65547, 7, 0, -65546, 8, 0, -65545, 8, 0, -65544, 8, 0, -65543, 8, 0, -65542, 8, 0, -65541, 8, 0, -65540, 8, 0, -65539, 8, 0, -65538, 8, 0, -65537, 8, 0, -131072, 8, 0, -131071, 8, 0, -131070, 8, 0, -21, 7, 0, -20, 7, 0, -19, 7, 0, -18, 7, 0, -17, 7, 0, -16, 7, 0, -15, 7, 0, -14, 7, 0, -13, 7, 0, -12, 7, 0, -11, 7, 0, -10, 8, 0, -9, 8, 0, -8, 8, 0, -7, 8, 0, -6, 8, 0, -5, 8, 0, -4, 8, 0, -3, 8, 0, -2, 8, 0, -1, 8, 0, -65536, 8, 0, -65535, 8, 0, -65534, 8, 0, 65515, 7, 0, 65516, 7, 0, 65517, 7, 0, 65518, 7, 0, 65519, 7, 0, 65520, 7, 0, 65521, 7, 0, 65522, 7, 0, 65523, 7, 0, 65524, 7, 0, 65525, 7, 0, 65526, 8, 0, 65527, 8, 0, 65528, 8, 0, 65529, 8, 0, 65530, 8, 0, 65531, 8, 0, 65532, 8, 0, 65533, 8, 0, 65534, 8, 0, 65535, 8, 0, 0, 8, 0, 1, 8, 0, 2, 8, 0, 524263, 8, 0 )
+
+[node name="Table" parent="." instance=ExtResource( 2 )]
+position = Vector2( -290.5, -35.7 )
+
+[node name="@Table@87" parent="." instance=ExtResource( 2 )]
+position = Vector2( -263.2, -35.7 )
+
+[node name="@Table@88" parent="." instance=ExtResource( 2 )]
+position = Vector2( -207.9, -37.1 )
+
+[node name="Light" parent="." instance=ExtResource( 3 )]
+position = Vector2( -159.6, -39.9 )
+
+[node name="@Light@89" parent="." instance=ExtResource( 3 )]
+position = Vector2( -49.7, -41.3 )
+
+[node name="@Light@90" parent="." instance=ExtResource( 3 )]
+position = Vector2( -2.79999, -41.3 )
+
+[node name="@Light@91" parent="." instance=ExtResource( 3 )]
+position = Vector2( -343, 126 )
+
+[node name="SwordBasic" parent="." instance=ExtResource( 5 )]
+position = Vector2( -102.2, -56 )
+
+[node name="@SwordBasic@92" parent="." instance=ExtResource( 5 )]
+position = Vector2( -236.6, -23.8 )

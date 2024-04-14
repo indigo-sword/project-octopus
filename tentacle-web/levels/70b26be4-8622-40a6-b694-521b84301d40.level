@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Objects/Table.gd" type="Script" id=1]
+[ext_resource path="res://Objects/Table.tscn" type="PackedScene" id=2]
+
+[node name="Level" type="Node2D"]
+position = Vector2( 1, -3 )
+
+[node name="Table" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 955.333, 291.667 )
+script = ExtResource( 1 )
+
+[node name="@Table@150" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1003.33, 454.333 )
+script = ExtResource( 1 )
+
+[node name="@Table@151" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1003.33, 463.667 )
+script = ExtResource( 1 )
+
+[node name="@Table@152" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1099.33, 366.333 )
+script = ExtResource( 1 )
+
+[node name="@Table@153" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1103.33, 363.667 )
+script = ExtResource( 1 )
+
+[node name="@Table@154" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1056.67, 433 )
+script = ExtResource( 1 )
+
+[node name="@Table@155" type="Area2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1015.33, 870.333 )
+script = ExtResource( 1 )

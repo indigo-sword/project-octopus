@@ -64,6 +64,10 @@ python3 api.py
 python3 [program]_test.py
 ```
 
+- If you only want to **use** the database, we left over here a database file with some data. You can use it to do whatever you need. Just run the server and the database will be used accordingly. 
+
+- We also left some sample levels in tentacle-web/levels. You can use them to test the server. Just run the server and the levels will be used accordingly.
+
 #### Where to get help
 
 - If you need help, please feel free to open an issue in the repository. We will be happy to help you.
@@ -74,13 +78,13 @@ python3 [program]_test.py
 - Flask: [Flask](https://flask.palletsprojects.com/en/3.0.x/)
 - SQLAlchemy: [SQLAlchemy](https://www.sqlalchemy.org/)
 - Python: [Python](https://www.python.org/)
-- Project Octopus: [Project Octopus](projectoctopus.org)
+- Branches Of Fate: [Branches Of Fate](projectoctopus.org)
 
 #### Current TODOs
 - Check our project's board for more detailed information on what we are working on: [Project Octopus Board](https://github.com/orgs/indigo-sword/projects/1)
 
 - [x] Server code
-- [ ] Client code (WIP)
+- [x] Client code
 - [x] Backend documentation
 - [ ] Game code (WIP)
 - [ ] Level editor (WIP)
@@ -88,9 +92,7 @@ python3 [program]_test.py
 
 #### Contributors
 
-**Be the first to contribute!**
-
-- We would love to have someone contribute to our project. If you want to be the first, please feel free to fork the repository and submit a pull request. Check out the [Contributing to the project](#contributing-to-the-project) section for more information.
+- **Daniel Carvalho**: Huge shoutout to Daniel "Desenhos" Carvalho for the amazing art he has been doing for the game. He created a lot of assets you will be seeing in the game, as well as the game's logo. Thanks, Daniel!
 
 #### License
 
