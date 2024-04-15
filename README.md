@@ -36,7 +36,21 @@
 #### Contributing to the project
 
 - Check our [Current TODOs](#current-todos)
-- If you want to contribute to any of them, please feel free to fork the repository and submit a pull request. We will be happy to review it and merge it if it is good. We will comment as soon as possible. Just be sure to follow a consistent style guide and to write unit tests for your code. Also make sure to document your code properly and that other unit tests are not broken.
+- Currently, the only thing this repo would need is new endpoints for the API. They would be great "first-issue" type of tasks. We will list some endpoints we need here.
+  - [ ] Get a user's nodes
+  - [ ] Get a user's paths
+  - [ ] Change a user's password
+  - [ ] Change a user's email
+  - [ ] Change a user's username
+  - [ ] Get most followed users
+  - [ ] Unlink two nodes, but *only if a user owns both nodes*
+  - [ ] (A *very* advanced one) help us change the Path class to store paths into a JSON representation of a dictionary graph
+
+- Please feel free to fork the repository and submit a pull request. We will be happy to review it and merge it if it fills the following requirements:
+  - Follows a consistent style guide (i.e. PEP8)
+  - Has unit tests that cover the new code
+  - Other unit tests are not broken
+  - Code is documented properly
 
 #### Installation
 
