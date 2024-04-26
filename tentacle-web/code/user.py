@@ -57,6 +57,11 @@ class User(Base):
         self.bio = bio
         self.save(session)
 
+    def update_username(self, session: Session, username: str):
+        """update username"""
+        self.username = username
+        self.save(session)
+
     def add_follower(self, session: Session):
         """update followers"""
         result = session.execute(
