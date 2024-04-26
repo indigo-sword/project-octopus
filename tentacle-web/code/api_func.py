@@ -59,6 +59,16 @@ def change_user_bio_func(username: str, bio: str, session: Session):
     u.update_bio(session, bio)
     return {"message": "user bio updated", "bio": bio}, 200
 
+def change_user_username_func(old_username: str, new_username: str, session: Session):
+    """change user username"""
+    u = session.query(User).filter(User.username == old_username).first()
+
+    if not u:
+        return {"message": "user not found"}, 404
+
+    u.update_username(session, new_username)
+    return {"message": "user's username updated", "username": new_username}, 200
+
 
 def follow_user_func(username: str, followed_username: str, session: Session):
     """follow user"""
