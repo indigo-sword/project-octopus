@@ -13,6 +13,9 @@ from db_manager import Base
 from uuid import uuid4
 from datetime import datetime
 import bcrypt
+import random
+import string
+
 
 
 class User(Base):
@@ -24,6 +27,7 @@ class User(Base):
     ts = Column(DateTime, default=datetime.utcnow)
     following = Column(Integer)
     followers = Column(Integer)
+    password_reset_token = Column(String, unique=True, default=None)
 
     def __init__(
         self, session: Session, username: str, password: str, email: str, bio: str = ""
@@ -256,6 +260,27 @@ class Friendship(Base):
 
     def __repr__(self):
         return f"Friendship({self.id}, {self.friend_one}, {self.friend_two}, {self.status})"
+    
+    def generate_reset_token(self, session: Session):
+        """Generate and store a password reset token"""
+        token = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+        self.password_reset_token = token
+        self.save(session)
+        # Send email to user with instructions and token for resetting password
+
+    def reset_password(self, session: Session, new_password: str, token: str):
+        """Reset user's password using the reset token"""
+        if self.password_reset_token != token:
+            raise ValueError("Invalid reset token")
+        self.password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+        self.password_reset_token = None
+        self.save(session)
+    
+    def reset_password(self, session: Session, new_password: str):
+        """Reset user's password"""
+        # You may want to add additional logic here, such as hashing the password
+        self.password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+        self.save(session)
 
 
 class Follow(Base):

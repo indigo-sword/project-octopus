@@ -555,6 +555,29 @@ def logger(environ, start_response):
     return app(environ, start_response)
 
 
+def reset_password_func(username: str, session: Session):
+    """Reset user's password"""
+    # Retrieve user from database
+    user = session.query(User).filter(User.username == username).first()
+    if not user:
+        return {"message": "user not found"}, 404
+
+    # Generate a new password
+    new_password = generate_random_password()
+
+    # Reset the password
+    user.reset_password(session, new_password)
+
+    # You might want to send the new password to the user via email or other means
+
+    return {"message": "password reset successfully", "new_password": new_password}, 200
+
+def generate_random_password(length=12):
+    """Generate a random password"""
+    characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(characters) for i in range(length))
+
+
 if __name__ == "__main__":
     from waitress import serve
 
