@@ -656,3 +656,48 @@ def path_info(p: Path, session: Session):
         "playcount": p.playcount,
         "node_sequence": [{"node": n.get_info(), "position": pos} for n, pos in zip(node_seq, positions)],
     }
+
+def forgot_password():
+    email = request.form["email"]
+    s = Session()
+    ret, code = send_password_reset_email(email, s)
+    Session.remove()
+    return ret, code
+
+
+def reset_password():
+    token = request.form["token"]
+    password = request.form["password"]
+    s = Session()
+    ret, code = reset_user_password(token, password, s)
+    Session.remove()
+    return ret, code
+
+
+def generate_reset_token():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+
+
+def send_password_reset_email(email, session):
+    token = generate_reset_token()
+    save_reset_token_to_database(email, token, session)
+    
+    email_utils.send_password_reset_email(email, token)
+    
+    return {"message": "Password reset email sent"}, 200
+
+
+def save_reset_token_to_database(email, token, session):
+    user = get_user_by_email(email, session)
+    user.reset_token = token
+    session.commit()
+
+def reset_user_password(token, new_password, session):
+
+    user = get_user_by_reset_token(token, session)
+    if not user:
+        return {"message": "Invalid token"}, 404
+    
+    user.password = hash_password(new_password)
+        user.reset_token = None
+        session.commit()
