@@ -100,7 +100,7 @@ def change_user_bio():
     Session.remove()
     return ret, code
     
-@app.route("/change_user_username", methods=["POST"])
+@app.route("/update_username", methods=["POST"])
 @login_required
 @attribute_required("new_username")
 def change_user_username():
