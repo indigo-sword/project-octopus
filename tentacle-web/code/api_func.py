@@ -67,7 +67,7 @@ def change_user_username_func(old_username: str, new_username: str, session: Ses
         return {"message": "user not found"}, 404
 
     u.update_username(session, new_username)
-    return {"message": "user's username updated", "username": new_username}, 200
+    return {"message": "username updated", "username": new_username}, 200
 
 
 def follow_user_func(username: str, followed_username: str, session: Session):
