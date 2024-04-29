@@ -99,6 +99,16 @@ def change_user_bio():
 
     Session.remove()
     return ret, code
+    
+@app.route("/update_username", methods=["POST"])
+@login_required
+@attribute_required("new_username")
+def change_user_username():
+    s = Session()
+    ret, code = change_user_username_func(request.form["username"], request.form["new_username"], s)
+
+    Session.remove()
+    return ret, code
 
 
 @app.route("/follow_user", methods=["POST"])
