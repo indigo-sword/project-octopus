@@ -41,7 +41,7 @@
   - [ ] Get a user's paths
   - [ ] Change a user's password
   - [ ] Change a user's email
-  - [ ] Change a user's username
+  - [x] Change a user's username
   - [ ] Get most followed users
   - [ ] Unlink two nodes, but *only if a user owns both nodes*
   - [ ] (A *very* advanced one) help us change the Path class to store paths into a JSON representation of a dictionary graph
@@ -113,6 +113,8 @@ python3 [program]_test.py
 #### Contributors
 
 - **Daniel Carvalho**: Huge shoutout to Daniel "Desenhos" Carvalho for the amazing art he has been doing for the game. He created a lot of assets you will be seeing in the game, as well as the game's logo. Thanks, Daniel!
+- **Anna Kelley**: Thanks for Anna "ack" Kelley for contributing with API endpoints about allowing a user to change his / her username.
+- **Alexandre Tagava**: Thanks for Alexandre "Alex" Tagava for contributing with music for the game.
 
 #### License
 
